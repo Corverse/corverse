@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人主页</title>
+    <title>标准计算机 - Standard Computer</title>
     <style>
         * {
             margin: 0;
@@ -12,218 +12,230 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 50px 40px;
-            max-width: 420px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            backdrop-filter: blur(10px);
-            animation: fadeInUp 0.8s ease;
+        .scene {
+            position: relative;
+            width: 900px;
+            height: 700px;
+            perspective: 1200px;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* ===== 显示器 ===== */
+        .monitor {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 520px;
+            height: 320px;
         }
 
-        .avatar {
-            width: 100px;
-            height: 100px;
+        .monitor-bezel {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .monitor-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            animation: screenOn 2s ease-out;
+        }
+
+        @keyframes screenOn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .taskbar {
+            height: 30px;
+            background: linear-gradient(180deg, #2d2d2d, #1a1a1a);
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 8px;
+        }
+
+        .taskbar-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: white;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            background: #ff5f57;
         }
+        .taskbar-dot:nth-child(2) { background: #febc2e; }
+        .taskbar-dot:nth-child(3) { background: #28c840; }
 
-        h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-            color: #2d3748;
-        }
-
-        .subtitle {
-            color: #718096;
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-
-        .info {
-            text-align: left;
-            margin: 25px 0;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-item .icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: #f7fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-size: 18px;
-        }
-
-        .info-item .text {
+        .desktop-icons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
             flex: 1;
         }
 
-        .info-item .label {
-            font-size: 12px;
-            color: #a0aec0;
-            margin-bottom: 2px;
-        }
-
-        .info-item .value {
-            font-size: 15px;
-            color: #2d3748;
-            font-weight: 500;
-        }
-
-        .links {
+        .icon {
             display: flex;
-            gap: 12px;
-            margin-top: 30px;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
-        .btn-primary {
-            background: #667eea;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        .icon-label {
+            color: #8b949e;
+            font-size: 10px;
+            text-align: center;
         }
 
-        .btn-secondary {
-            background: #edf2f7;
-            color: #4a5568;
+        .icon:nth-child(1) .icon-box { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .icon:nth-child(2) .icon-box { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .icon:nth-child(3) .icon-box { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .icon:nth-child(4) .icon-box { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .icon:nth-child(5) .icon-box { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .icon:nth-child(6) .icon-box { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+        .icon:nth-child(7) .icon-box { background: linear-gradient(135deg, #d299c2, #fef9d7); }
+        .icon:nth-child(8) .icon-box { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
+
+        .monitor-stand {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 40px;
+            background: linear-gradient(180deg, #333, #222);
+            border-radius: 0 0 8px 8px;
         }
 
-        .btn-secondary:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
+        .monitor-base {
+            position: absolute;
+            bottom: -55px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 15px;
+            background: linear-gradient(180deg, #444, #222);
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
         }
 
-        .footer {
-            margin-top: 25px;
-            font-size: 13px;
-            color: #a0aec0;
+        .monitor-logo {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 10px;
+            letter-spacing: 2px;
         }
 
-        .time {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #718096;
-            font-variant-numeric: tabular-nums;
+        .power-led {
+            position: absolute;
+            bottom: 8px;
+            right: 20px;
+            width: 6px;
+            height: 6px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ff88;
+            animation: pulse 2s infinite;
         }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="avatar">👋</div>
-        <h1>你好，世界</h1>
-        <p class="subtitle">这是我的 GitHub Pages 主页</p>
 
-        <div class="info">
-            <div class="info-item">
-                <div class="icon">🚀</div>
-                <div class="text">
-                    <div class="label">项目</div>
-                    <div class="value">GitHub Pages 静态网站</div>
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="icon">⚡</div>
-                <div class="text">
-                    <div class="label">技术</div>
-                    <div class="value">HTML + CSS</div>
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="icon">📅</div>
-                <div class="text">
-                    <div class="label">创建于</div>
-                    <div class="value">2026年6月</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="links">
-            <a href="https://github.com" target="_blank" class="btn btn-primary">
-                <span>⭐</span> GitHub
-            </a>
-            <a href="#" class="btn btn-secondary">
-                <span>📧</span> 联系我
-            </a>
-        </div>
-
-        <div class="time" id="clock">--:--:--</div>
-        <div class="footer">Powered by GitHub Pages</div>
-    </div>
-
-    <script>
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('zh-CN', {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            document.getElementById('clock').textContent = timeString;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
-        updateClock();
-        setInterval(updateClock, 1000);
-    </script>
-</body>
-</html>
+
+        /* ===== 主机箱 ===== */
+        .computer-case {
+            position: absolute;
+            bottom: 80px;
+            right: 80px;
+            width: 200px;
+            height: 350px;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 8px;
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .case-front-panel {
+            height: 60px;
+            background: linear-gradient(145deg, #333, #222);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 10px;
+        }
+
+        .usb-port {
+            width: 30px;
+            height: 12px;
+            background: #111;
+            border-radius: 2px;
+            border: 1px solid #444;
+            position: relative;
+        }
+
+        .usb-port::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 6px;
+            background: #222;
+            border-radius: 1px;
+        }
+
+        .power-button {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30
