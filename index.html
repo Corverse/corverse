@@ -560,4 +560,718 @@
 
       ctx.fillStyle = "#fee2e2";
 
-      ctx.beginP
+      ctx.beginPath();
+
+      ctx.arc(0, 2, 5, 0, Math.PI * 2);
+
+      ctx.fill();
+
+    }
+
+    ctx.restore();
+
+  }
+
+  function playerShoot() {
+
+    bullets.push({
+
+      x: player.x,
+
+      y: player.y - 22,
+
+      vx: 0,
+
+      vy: -560,
+
+      r: 4,
+
+      from: "player",
+
+      dmg: 1
+
+    });
+
+    if (score > 300) {
+
+      bullets.push({
+
+        x: player.x - 12,
+
+        y: player.y - 12,
+
+        vx: -70,
+
+        vy: -520,
+
+        r: 3,
+
+        from: "player",
+
+        dmg: 1
+
+      });
+
+      bullets.push({
+
+        x: player.x + 12,
+
+        y: player.y - 12,
+
+        vx: 70,
+
+        vy: -520,
+
+        r: 3,
+
+        from: "player",
+
+        dmg: 1
+
+      });
+
+    }
+
+  }
+
+  function enemyShoot(e) {
+
+    if (e.type === "boss") {
+
+      for (let i = -2; i <= 2; i++) {
+
+        bullets.push({
+
+          x: e.x,
+
+          y: e.y + 24,
+
+          vx: i * 80,
+
+          vy: 190 + Math.abs(i) * 35,
+
+          r: 5,
+
+          from: "enemy",
+
+          dmg: 12
+
+        });
+
+      }
+
+    } else {
+
+      const angle = Math.atan2(player.y - e.y, player.x - e.x);
+
+      const speed = e.type === "shooter" ? 230 : 180;
+
+      bullets.push({
+
+        x: e.x,
+
+        y: e.y + 15,
+
+        vx: Math.cos(angle) * speed,
+
+        vy: Math.sin(angle) * speed,
+
+        r: 5,
+
+        from: "enemy",
+
+        dmg: 10
+
+      });
+
+    }
+
+  }
+
+  let spawnTimer = 0;
+
+  let bossSpawnedAt = 0;
+
+  function spawnEnemy() {
+
+    const roll = Math.random();
+
+    let type = "basic";
+
+    if (score > 150 && roll > 0.65) type = "shooter";
+
+    if (score > 350 && roll > 0.82) type = "zigzag";
+
+    const enemy = {
+
+      x: rand(30, W - 30),
+
+      y: -40,
+
+      r: type === "basic" ? 17 : 20,
+
+      hp: type === "basic" ? 2 : 4,
+
+      maxHp: type === "basic" ? 2 : 4,
+
+      type,
+
+      speed: rand(70, 130) + difficulty * 6,
+
+      shootTimer: rand(0.7, 2.0),
+
+      t: 0
+
+    };
+
+    enemies.push(enemy);
+
+  }
+
+  function spawnBoss() {
+
+    enemies.push({
+
+      x: W / 2,
+
+      y: -70,
+
+      r: 46,
+
+      hp: 60 + difficulty * 8,
+
+      maxHp: 60 + difficulty * 8,
+
+      type: "boss",
+
+      speed: 45,
+
+      shootTimer: 1,
+
+      t: 0,
+
+      dir: 1
+
+    });
+
+  }
+
+  function maybeDropItem(x, y) {
+
+    if (Math.random() > 0.16) return;
+
+    const type = Math.random() < 0.55 ? "heal" : "shield";
+
+    items.push({
+
+      x,
+
+      y,
+
+      r: 12,
+
+      type,
+
+      vy: 95
+
+    });
+
+  }
+
+  function update(dt) {
+
+    if (!running || paused || gameOver) return;
+
+    difficulty = 1 + score / 450;
+
+    for (const s of stars) {
+
+      s.y += s.speed * dt;
+
+      if (s.y > H) {
+
+        s.y = -5;
+
+        s.x = Math.random() * W;
+
+      }
+
+    }
+
+    player.x += (player.tx - player.x) * Math.min(1, dt * 12);
+
+    player.y += (player.ty - player.y) * Math.min(1, dt * 12);
+
+    player.x = clamp(player.x, 20, W - 20);
+
+    player.y = clamp(player.y, 60, H - 25);
+
+    player.fireTimer -= dt;
+
+    player.invincible = Math.max(0, player.invincible - dt);
+
+    player.shield = Math.max(0, player.shield - dt);
+
+    if (player.fireTimer <= 0) {
+
+      playerShoot();
+
+      player.fireTimer = score > 800 ? 0.12 : score > 300 ? 0.16 : 0.22;
+
+    }
+
+    spawnTimer -= dt;
+
+    if (spawnTimer <= 0) {
+
+      spawnEnemy();
+
+      spawnTimer = Math.max(0.25, 0.85 - difficulty * 0.07);
+
+    }
+
+    if (score > 0 && score % 700 < 8 && score - bossSpawnedAt > 500) {
+
+      spawnBoss();
+
+      bossSpawnedAt = score;
+
+    }
+
+    for (const e of enemies) {
+
+      e.t += dt;
+
+      if (e.type === "zigzag") {
+
+        e.x += Math.sin(e.t * 4) * 130 * dt;
+
+      }
+
+      if (e.type === "boss") {
+
+        if (e.y < 90) {
+
+          e.y += e.speed * dt;
+
+        } else {
+
+          e.x += e.dir * 90 * dt;
+
+          if (e.x < 65 || e.x > W - 65) e.dir *= -1;
+
+        }
+
+      } else {
+
+        e.y += e.speed * dt;
+
+      }
+
+      e.shootTimer -= dt;
+
+      if (e.shootTimer <= 0) {
+
+        enemyShoot(e);
+
+        e.shootTimer = e.type === "boss" ? 0.75 : rand(1.1, 2.3) / difficulty;
+
+      }
+
+    }
+
+    for (const b of bullets) {
+
+      b.x += b.vx * dt;
+
+      b.y += b.vy * dt;
+
+    }
+
+    for (const it of items) {
+
+      it.y += it.vy * dt;
+
+    }
+
+    for (const p of particles) {
+
+      p.x += p.vx * dt;
+
+      p.y += p.vy * dt;
+
+      p.life -= dt;
+
+    }
+
+    handleCollisions();
+
+    bullets = bullets.filter(b => b.x > -40 && b.x < W + 40 && b.y > -60 && b.y < H + 60);
+
+    enemies = enemies.filter(e => e.y < H + 80 && e.hp > 0);
+
+    particles = particles.filter(p => p.life > 0);
+
+    items = items.filter(it => it.y < H + 40);
+
+    scoreEl.textContent = score;
+
+    hpEl.textContent = Math.max(0, Math.round(player.hp));
+
+  }
+
+  function handleCollisions() {
+
+    for (const b of bullets) {
+
+      if (b.from === "player") {
+
+        for (const e of enemies) {
+
+          if (dist(b, e) < b.r + e.r) {
+
+            b.dead = true;
+
+            e.hp -= b.dmg;
+
+            createExplosion(b.x, b.y, "#93c5fd", 4);
+
+            if (e.hp <= 0) {
+
+              const gain = e.type === "boss" ? 250 : e.type === "basic" ? 20 : 40;
+
+              score += gain;
+
+              createExplosion(e.x, e.y, e.type === "boss" ? "#f87171" : "#facc15", e.type === "boss" ? 60 : 22);
+
+              maybeDropItem(e.x, e.y);
+
+            }
+
+            break;
+
+          }
+
+        }
+
+      } else {
+
+        if (player.invincible <= 0 && dist(b, player) < b.r + player.r) {
+
+          b.dead = true;
+
+          if (player.shield > 0) {
+
+            createExplosion(b.x, b.y, "#60a5fa", 8);
+
+          } else {
+
+            player.hp -= b.dmg;
+
+            player.invincible = 0.55;
+
+            createExplosion(player.x, player.y, "#fb7185", 14);
+
+            if (player.hp <= 0) {
+
+              endGame();
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    bullets = bullets.filter(b => !b.dead);
+
+    for (const e of enemies) {
+
+      if (player.invincible <= 0 && dist(e, player) < e.r + player.r) {
+
+        e.hp = 0;
+
+        if (player.shield <= 0) {
+
+          player.hp -= e.type === "boss" ? 35 : 20;
+
+          player.invincible = 0.8;
+
+        }
+
+        createExplosion(e.x, e.y, "#f87171", 24);
+
+        if (player.hp <= 0) endGame();
+
+      }
+
+    }
+
+    for (const it of items) {
+
+      if (dist(it, player) < it.r + player.r) {
+
+        it.dead = true;
+
+        if (it.type === "heal") {
+
+          player.hp = Math.min(player.maxHp, player.hp + 25);
+
+          createExplosion(player.x, player.y, "#22c55e", 16);
+
+        } else {
+
+          player.shield = 6;
+
+          createExplosion(player.x, player.y, "#60a5fa", 16);
+
+        }
+
+      }
+
+    }
+
+    items = items.filter(it => !it.dead);
+
+  }
+
+  function endGame() {
+
+    gameOver = true;
+
+    running = false;
+
+    if (score > best) {
+
+      best = score;
+
+      localStorage.setItem("spaceBattleBest", String(best));
+
+      bestEl.textContent = best;
+
+    }
+
+    menu.style.display = "flex";
+
+    menu.querySelector("h1").textContent = "游戏结束";
+
+    menu.querySelector("p").innerHTML =
+
+      `你的分数：<b>${score}</b><br>最高分：<b>${best}</b><br><br>继续练，弹幕游戏的核心是提前走位，不是临时乱躲。`;
+
+    startBtn.textContent = "重新开始";
+
+  }
+
+  function draw() {
+
+    ctx.clearRect(0, 0, W, H);
+
+    drawStars();
+
+    for (const it of items) drawItem(it);
+
+    for (const b of bullets) drawBullet(b);
+
+    for (const e of enemies) drawEnemy(e);
+
+    drawPlayer();
+
+    for (const p of particles) drawParticle(p);
+
+    if (paused && running) {
+
+      ctx.fillStyle = "rgba(0,0,0,0.45)";
+
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = "white";
+
+      ctx.font = "28px Arial";
+
+      ctx.textAlign = "center";
+
+      ctx.fillText("已暂停", W / 2, H / 2);
+
+      ctx.font = "15px Arial";
+
+      ctx.fillText("点击右上角继续", W / 2, H / 2 + 34);
+
+    }
+
+  }
+
+  function drawStars() {
+
+    ctx.fillStyle = "rgba(255,255,255,0.75)";
+
+    for (const s of stars) {
+
+      ctx.beginPath();
+
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+
+      ctx.fill();
+
+    }
+
+  }
+
+  function drawBullet(b) {
+
+    ctx.beginPath();
+
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+
+    ctx.fillStyle = b.from === "player" ? "#38bdf8" : "#fb7185";
+
+    ctx.fill();
+
+    ctx.shadowBlur = 12;
+
+    ctx.shadowColor = b.from === "player" ? "#38bdf8" : "#fb7185";
+
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+
+  }
+
+  function drawParticle(p) {
+
+    const alpha = Math.max(0, p.life / p.maxLife);
+
+    ctx.globalAlpha = alpha;
+
+    ctx.beginPath();
+
+    ctx.arc(p.x, p.y, p.r * alpha, 0, Math.PI * 2);
+
+    ctx.fillStyle = p.color;
+
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+
+  }
+
+  function drawItem(it) {
+
+    ctx.save();
+
+    ctx.translate(it.x, it.y);
+
+    ctx.rotate(Date.now() / 400);
+
+    ctx.beginPath();
+
+    ctx.arc(0, 0, it.r, 0, Math.PI * 2);
+
+    ctx.fillStyle = it.type === "heal" ? "#22c55e" : "#3b82f6";
+
+    ctx.fill();
+
+    ctx.fillStyle = "white";
+
+    ctx.font = "bold 14px Arial";
+
+    ctx.textAlign = "center";
+
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(it.type === "heal" ? "+" : "S", 0, 1);
+
+    ctx.restore();
+
+  }
+
+  function loop(t) {
+
+    const dt = Math.min(0.033, (t - lastTime) / 1000 || 0);
+
+    lastTime = t;
+
+    update(dt);
+
+    draw();
+
+    requestAnimationFrame(loop);
+
+  }
+
+  function setTargetFromEvent(e) {
+
+    const rect = canvas.getBoundingClientRect();
+
+    const x = e.clientX - rect.left;
+
+    const y = e.clientY - rect.top;
+
+    player.tx = clamp(x, 20, W - 20);
+
+    player.ty = clamp(y, 60, H - 25);
+
+  }
+
+  canvas.addEventListener("pointerdown", e => {
+
+    setTargetFromEvent(e);
+
+  });
+
+  canvas.addEventListener("pointermove", e => {
+
+    setTargetFromEvent(e);
+
+  });
+
+  startBtn.addEventListener("click", () => {
+
+    resetGame();
+
+    running = true;
+
+    paused = false;
+
+    menu.style.display = "none";
+
+    pauseBtn.textContent = "暂停";
+
+  });
+
+  pauseBtn.addEventListener("click", () => {
+
+    if (!running) return;
+
+    paused = !paused;
+
+    pauseBtn.textContent = paused ? "继续" : "暂停";
+
+  });
+
+  document.addEventListener("visibilitychange", () => {
+
+    if (document.hidden && running) {
+
+      paused = true;
+
+      pauseBtn.textContent = "继续";
+
+    }
+
+  });
+
+  resetGame();
+
+  requestAnimationFrame(loop);
+
+})();
+
+</script>
+
+</body>
+
+</html>
