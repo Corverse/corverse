@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-    <title>塔防无尽模式 · 敌人削弱 & 地面单位增强</title>
+    <title>塔防无尽模式 · 远程调整版</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -23,17 +23,16 @@
         .info-cell { background:rgba(255,255,255,0.05); border-radius:8px; padding:5px 6px; text-align:center; color:#ccc; font-weight:bold; white-space:nowrap; }
         .info-cell .val { font-size:15px; display:block; margin-top:1px; }
         .info-cell.gold .val { color:#f0c040; } .info-cell.wave .val { color:#ff9800; } .info-cell.kills .val { color:#f44336; } .info-cell.diff .val { color:#e91e63; }
-        #unit-desc { font-size:10px; color:#aaa; background:rgba(255,255,255,0.04); border-radius:6px; padding:3px 8px; text-align:center; min-height:18px; line-height:1.3; }
-        #unit-buttons { display:flex; gap:4px; overflow-x:auto; padding:2px 0; scrollbar-width:none; flex-shrink:0; }
-        #unit-buttons::-webkit-scrollbar { display:none; }
-        .unit-btn { flex-shrink:0; width:48px; height:56px; border-radius:8px; border:1.5px solid #3a3a5a; background:var(--btn-bg); color:#ccc; font-size:9px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; transition:0.15s; position:relative; text-align:center; }
+        #unit-desc { font-size:12px; color:#ddd; background:rgba(255,255,255,0.06); border-radius:8px; padding:5px 10px; text-align:center; min-height:22px; line-height:1.4; font-weight:500; }
+        #unit-buttons { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; padding:2px 0; flex-shrink:0; }
+        .unit-btn { width:68px; height:72px; border-radius:10px; border:2px solid #3a3a5a; background:var(--btn-bg); color:#ccc; font-size:10px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; transition:0.15s; position:relative; text-align:center; }
         .unit-btn.selected { border-color:#ffcc00; box-shadow:0 0 14px rgba(255,200,0,0.55); background:#3a3a20; color:#fff; transform:scale(1.04); }
         .unit-btn.on-cooldown { opacity:0.35; pointer-events:none; border-color:#444; }
-        .unit-btn .icon { font-size:19px; line-height:1; }
-        .unit-btn .cost { font-size:8px; color:var(--gold); font-weight:bold; }
-        .unit-btn .cd-overlay { position:absolute; bottom:2px; font-size:8px; color:#ff6666; font-weight:bold; display:none; }
+        .unit-btn .icon { font-size:24px; line-height:1; }
+        .unit-btn .cost { font-size:9px; color:var(--gold); font-weight:bold; }
+        .unit-btn .cd-overlay { position:absolute; bottom:3px; font-size:9px; color:#ff6666; font-weight:bold; display:none; }
         .unit-btn.on-cooldown .cd-overlay { display:block; }
-        .unit-btn.road-unit { border-left:3px solid #ff9800; } .unit-btn.ranged-unit { border-left:3px solid #4fc3f7; }
+        .unit-btn.road-unit { border-left:4px solid #ff9800; } .unit-btn.ranged-unit { border-left:4px solid #4fc3f7; }
         #action-row { display:flex; gap:5px; flex-wrap:wrap; }
         .action-btn { flex:1; min-width:55px; padding:8px 6px; border-radius:12px; border:none; font-size:11px; font-weight:bold; cursor:pointer; white-space:nowrap; text-align:center; transition:0.15s; }
         .action-btn:active { transform:scale(0.94); }
@@ -64,7 +63,7 @@
             <div class="info-cell diff">⚠难度<span class="val" id="diff-display">0.50</span>x</div>
             <div class="info-cell">⏳冷却<span class="val" id="cd-summary">-</span></div>
         </div>
-        <div id="unit-desc">👆 选择单位按钮 / 点击地图单位查看范围</div>
+        <div id="unit-desc">👆 选择单位查看详细数据与定位</div>
         <div id="unit-buttons"></div>
         <div id="action-row">
             <button class="action-btn btn-delete-mode" id="btn-delete-mode">🔧出售</button>
@@ -100,7 +99,7 @@
     const COOLDOWN_DURATION = 8;
     const HEAL_DELAY = 2.0, HEAL_RATE = 0.05;
     const DIFFICULTY_START = 0.5;
-    const DIFFICULTY_RATE = 0.01;   // 每秒提升0.01
+    const DIFFICULTY_RATE = 0.01;
 
     const MAP_PRESETS = [
         { spawns: [{ col: 0, row: 2 }], base: { col: 15, row: 3 }, paths: [[{ c:0,r:2 },{ c:1,r:2 },{ c:2,r:2 },{ c:3,r:2 },{ c:4,r:2 },{ c:4,r:3 },{ c:4,r:4 },{ c:4,r:5 },{ c:5,r:5 },{ c:6,r:5 },{ c:7,r:5 },{ c:8,r:5 },{ c:9,r:5 },{ c:10,r:5 },{ c:11,r:5 },{ c:11,r:4 },{ c:11,r:3 },{ c:11,r:2 },{ c:11,r:1 },{ c:12,r:1 },{ c:13,r:1 },{ c:14,r:1 },{ c:15,r:1 },{ c:15,r:2 },{ c:15,r:3 }]] },
@@ -108,24 +107,33 @@
         { spawns: [{ col: 0, row: 1 }, { col: 0, row: 6 }], base: { col: 15, row: 3 }, paths: [[{ c:0,r:1 },{ c:1,r:1 },{ c:2,r:1 },{ c:3,r:1 },{ c:4,r:1 },{ c:5,r:1 },{ c:5,r:2 },{ c:5,r:3 },{ c:6,r:3 },{ c:7,r:3 },{ c:8,r:3 },{ c:9,r:3 },{ c:10,r:3 },{ c:11,r:3 },{ c:12,r:3 },{ c:13,r:3 },{ c:14,r:3 },{ c:15,r:3 }],[{ c:0,r:6 },{ c:1,r:6 },{ c:2,r:6 },{ c:3,r:6 },{ c:4,r:6 },{ c:5,r:6 },{ c:5,r:5 },{ c:5,r:4 },{ c:5,r:3 },{ c:6,r:3 },{ c:7,r:3 },{ c:8,r:3 },{ c:9,r:3 },{ c:10,r:3 },{ c:11,r:3 },{ c:12,r:3 },{ c:13,r:3 },{ c:14,r:3 },{ c:15,r:3 }]] }
     ];
 
+    // 远程单位：血量统一91，伤害再降10%，射手价格100
     const UNIT_DEFS = {
         ranged: [
-            { id:'ranger', name:'射手', icon:'🏹', cost:100, hp:80, dmg:15, range:3.0, spd:1.0, road:false, aoe:false, color:'#4fc3f7', desc:'单体·中射程' },
-            { id:'wide', name:'广域', icon:'🎯', cost:80, hp:60, dmg:8, range:5.0, spd:1.2, road:false, aoe:false, color:'#81d4fa', desc:'大范围·低伤' },
-            { id:'bomber', name:'炮手', icon:'💣', cost:150, hp:100, dmg:20, range:2.5, spd:1.5, road:false, aoe:true, color:'#ff8a65', desc:'范围爆炸' },
-            { id:'quick', name:'速射', icon:'🔫', cost:90, hp:50, dmg:6, range:3.5, spd:0.5, road:false, aoe:false, color:'#a5d6a7', desc:'极快攻速' },
-            { id:'heavy', name:'重炮', icon:'💥', cost:200, hp:120, dmg:40, range:4.0, spd:2.0, road:false, aoe:false, color:'#ef5350', desc:'高伤慢速' }
+            { id:'ranger', name:'射手', icon:'🏹', cost:100, hp:91, dmg:16, range:3.0, atkSpeed:0.7, road:false, aoe:false, color:'#4fc3f7',
+              desc:'标准的输出，性价比高，偏前期使用。' },
+            { id:'wide', name:'广域', icon:'🎯', cost:120, hp:91, dmg:11, range:5.0, atkSpeed:0.84, road:false, aoe:false, color:'#81d4fa',
+              desc:'拥有大范围的射程，建议到后期铺满角落。' },
+            { id:'bomber', name:'炮手', icon:'💣', cost:150, hp:91, dmg:22, range:2.0, atkSpeed:1.5, road:false, aoe:true, maxTargets:3, color:'#ff8a65',
+              desc:'能同时攻击三个目标，清杂利器。' },
+            { id:'quick', name:'速射', icon:'🔫', cost:120, hp:91, dmg:8, range:3.5, atkSpeed:0.35, road:false, aoe:false, color:'#a5d6a7',
+              desc:'高攻速低伤害，输出流稳定，可用于补伤害。' },
+            { id:'heavy', name:'重炮', icon:'💥', cost:200, hp:91, dmg:31, range:3.0, atkSpeed:2.0, road:false, aoe:false, color:'#ef5350',
+              desc:'高伤害低射速，多用于打BOSS。' }
         ],
         road: [
-            { id:'block1', name:'路障', icon:'🛡️', cost:75, hp:150, dmg:10, range:1.6, spd:1.0, road:true, block:1, refund:true, aoe:false, color:'#ffb74d', desc:'阻挡1·返全费' },
-            { id:'tank', name:'重盾', icon:'🏰', cost:120, hp:400, dmg:5, range:1.6, spd:1.2, road:true, block:3, aoe:false, color:'#ff9800', desc:'高血·阻挡3' },
-            { id:'spike', name:'尖刺', icon:'⚔️', cost:100, hp:100, dmg:25, range:1.6, spd:0.6, road:true, block:0, aoe:false, color:'#f44336', desc:'无阻挡·高伤' },
-            { id:'aoe_block', name:'旋风', icon:'🌪️', cost:160, hp:200, dmg:15, range:1.6, spd:1.0, road:true, block:2, aoe:true, color:'#ba68c8', desc:'群伤·阻挡2' }
+            { id:'block1', name:'近卫', icon:'🛡️', cost:75, hp:330, dmg:17, range:1.6, atkSpeed:0.7, road:true, block:1, refund:true, aoe:false, color:'#ffb74d',
+              desc:'售卖能返还全部费用，用于骗伤害，只能阻挡一个单位，也可以用来空降单切。' },
+            { id:'tank', name:'重盾', icon:'🏰', cost:120, hp:676, dmg:7, range:1.6, atkSpeed:1.2, road:true, block:3, aoe:false, color:'#ff9800',
+              desc:'标准的防御单位，性价比高。' },
+            { id:'spike', name:'尖刺', icon:'⚔️', cost:100, hp:439, dmg:33, range:1.6, atkSpeed:0.6, road:true, block:0, aoe:false, color:'#f44336',
+              desc:'伤害高但无法阻挡单位，可以配合重盾打输出。' },
+            { id:'aoe_block', name:'旋风', icon:'🌪️', cost:160, hp:439, dmg:20, range:2.0, atkSpeed:1.0, road:true, block:2, aoe:true, maxTargets:3, color:'#ba68c8',
+              desc:'高输出的范围伤害，能阻挡两个单位，可以减轻阻挡负担。' }
         ]
     };
 
     const ENEMY_TYPES = [
-        // 基础数值已下调约30%
         { id:'normal', name:'普通', color:'#f44336', hp:70, dmg:7, spd:1.0, ranged:false, rrange:0, w:40 },
         { id:'fast', name:'快速', color:'#ff9800', hp:35, dmg:4, spd:2.5, ranged:false, rrange:0, w:25 },
         { id:'tank', name:'坦克', color:'#795548', hp:200, dmg:10, spd:0.5, ranged:false, rrange:0, w:20 },
@@ -231,7 +239,7 @@
             if (this.atkCd>0) { this.atkCd-=dt; return; }
             const targets = this.findTargets(game);
             if (targets.length) {
-                this.atkCd = this.def.spd;
+                this.atkCd = this.def.atkSpeed;
                 targets.forEach(e => {
                     e.takeDamage(this.def.dmg, game);
                     const cx=this.col*CELL_SIZE+CELL_SIZE/2, cy=this.row*CELL_SIZE+CELL_SIZE/2;
@@ -245,7 +253,9 @@
         findTargets(game) {
             const cx=this.col*CELL_SIZE+CELL_SIZE/2, cy=this.row*CELL_SIZE+CELL_SIZE/2;
             const range = this.def.range * CELL_SIZE;
-            return game.enemies.filter(e=>e.alive && Math.hypot(e.getPos(game).x-cx, e.getPos(game).y-cy)<=range).sort((a,b)=>b.pathPos-a.pathPos).slice(0, this.def.aoe?5:1);
+            const candidates = game.enemies.filter(e=>e.alive && Math.hypot(e.getPos(game).x-cx, e.getPos(game).y-cy)<=range).sort((a,b)=>b.pathPos-a.pathPos);
+            const maxTargets = this.def.maxTargets || (this.def.aoe ? 5 : 1);
+            return candidates.slice(0, maxTargets);
         }
         takeDamage(dmg, game) { this.hp-=dmg; this.lastDmgTime=game.gameTime; spawnParticles(this.col*CELL_SIZE+CELL_SIZE/2, this.row*CELL_SIZE+CELL_SIZE/2, 4, '#ff6666', {speed:70, lifetime:0.35, size:3}); if(this.hp<=0) { this.hp=0; this.alive=false; this.onDeath(game); } }
         onDeath(game) {
@@ -346,8 +356,12 @@
             const cx=unit.col*CELL_SIZE+CELL_SIZE/2, cy=unit.row*CELL_SIZE+CELL_SIZE/2;
             ctx.fillStyle=unit.def.color; ctx.beginPath(); ctx.arc(cx,cy,CELL_SIZE*0.34,0,Math.PI*2); ctx.fill();
             ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
-            if (unit.def.road && unit.def.block) { ctx.fillStyle='#fff'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center'; ctx.fillText(`${unit.blocked.length}/${unit.def.block}`,cx,cy+1); }
-            drawHealthBar(ctx, cx, cy-CELL_SIZE*0.38-8, CELL_SIZE*0.65, 5, unit.hp/unit.maxHp);
+            ctx.fillStyle='#fff';
+            ctx.font='bold 16px sans-serif';
+            ctx.textAlign='center';
+            ctx.textBaseline='middle';
+            ctx.fillText(unit.def.icon, cx, cy);
+            if (unit.def.road) drawHealthBar(ctx, cx, cy-CELL_SIZE*0.38-8, CELL_SIZE*0.65, 5, unit.hp/unit.maxHp);
         });
         game.enemies.forEach(enemy=>{
             if (!enemy||!enemy.alive) return;
@@ -417,9 +431,15 @@
             if (!isNaN(cost)) btn.style.opacity = (game.gold<cost && !btn.classList.contains('on-cooldown')) ? '0.45' : '1';
         });
         const descDiv = document.getElementById('unit-desc');
-        if (selectedPlacedUnit && selectedPlacedUnit.alive) descDiv.innerHTML = `<strong>🔍 ${selectedPlacedUnit.def.icon} ${selectedPlacedUnit.def.name}</strong> · 范围:${selectedPlacedUnit.def.range} 攻击:${selectedPlacedUnit.def.dmg}`;
-        else if (selectedDef) descDiv.innerHTML = `<strong>📌 ${selectedDef.icon} ${selectedDef.name}</strong> · ${selectedDef.desc} · 💰${selectedDef.cost}`;
-        else descDiv.textContent = '👆 选择单位按钮 / 点击地图单位查看范围';
+        if (selectedPlacedUnit && selectedPlacedUnit.alive) {
+            const u = selectedPlacedUnit.def;
+            descDiv.innerHTML = `<strong>🔍 ${u.icon} ${u.name}</strong> 生命:${u.hp} 伤害:${u.dmg} 范围:${u.range} 攻速:${u.atkSpeed}s` + (u.block ? ` 阻挡:${u.block}` : '') + `<br><span style="color:#aaa;font-size:11px;">${u.desc}</span>`;
+        } else if (selectedDef) {
+            const u = selectedDef;
+            descDiv.innerHTML = `<strong>📌 ${u.icon} ${u.name}</strong> 生命:${u.hp} 伤害:${u.dmg} 范围:${u.range} 攻速:${u.atkSpeed}s` + (u.block ? ` 阻挡:${u.block}` : '') + ` · 💰${u.cost}<br><span style="color:#aaa;font-size:11px;">${u.desc}</span>`;
+        } else {
+            descDiv.textContent = '👆 选择单位查看详细数据与定位';
+        }
         const delBtn = document.getElementById('btn-delete-mode'); delBtn.classList.toggle('active', deleteMode); delBtn.textContent = deleteMode?'🔧出售中':'🔧出售';
         document.querySelectorAll('.unit-btn').forEach(btn=>{ btn.classList.toggle('selected', selectedDef && btn.dataset.unitId===selectedDef.id); });
     }
@@ -427,7 +447,9 @@
     function buildUnitButtons() {
         const container = document.getElementById('unit-buttons'); container.innerHTML = '';
         UNIT_DEFS.ranged.forEach(d=>container.appendChild(createButton(d,'ranged-unit')));
-        const sep = document.createElement('div'); sep.style.cssText='width:2px;background:#444;flex-shrink:0;border-radius:1px;margin:0 3px;'; container.appendChild(sep);
+        const sep = document.createElement('div');
+        sep.style.cssText='width:100%;height:2px;background:#2a2a4a;border-radius:1px;margin:2px 0;';
+        container.appendChild(sep);
         UNIT_DEFS.road.forEach(d=>container.appendChild(createButton(d,'road-unit')));
     }
     function createButton(def, cls) {
