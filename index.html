@@ -90,7 +90,6 @@
             { spawns: [{ col: 0, row: 1 }, { col: 0, row: 6 }], base: { col: 15, row: 3 }, paths: [[{ c:0,r:1 },{ c:1,r:1 },{ c:2,r:1 },{ c:3,r:1 },{ c:4,r:1 },{ c:5,r:1 },{ c:5,r:2 },{ c:5,r:3 },{ c:6,r:3 },{ c:7,r:3 },{ c:8,r:3 },{ c:9,r:3 },{ c:10,r:3 },{ c:11,r:3 },{ c:12,r:3 },{ c:13,r:3 },{ c:14,r:3 },{ c:15,r:3 }],[{ c:0,r:6 },{ c:1,r:6 },{ c:2,r:6 },{ c:3,r:6 },{ c:4,r:6 },{ c:5,r:6 },{ c:5,r:5 },{ c:5,r:4 },{ c:5,r:3 },{ c:6,r:3 },{ c:7,r:3 },{ c:8,r:3 },{ c:9,r:3 },{ c:10,r:3 },{ c:11,r:3 },{ c:12,r:3 },{ c:13,r:3 },{ c:14,r:3 },{ c:15,r:3 }]] }
         ];
 
-        // 最终数值调整
         const UNIT_DEFS = {
             ranged: [
                 { id:'ranger', name:'射手', icon:'🏹', cost:100, hp:91, dmg:26, range:3.0, atkSpeed:0.7, road:false, aoe:false, color:'#4fc3f7', desc:'标准的输出，性价比高，偏前期使用。' },
@@ -100,10 +99,10 @@
                 { id:'heavy', name:'重炮', icon:'💥', cost:200, hp:91, dmg:80, range:3.5, atkSpeed:2.0, road:false, aoe:false, color:'#ef5350', desc:'高伤害低射速，多用于打BOSS。' }
             ],
             road: [
-                { id:'block1', name:'近卫', icon:'🛡️', cost:75, hp:530, dmg:32, range:1.6, atkSpeed:0.7, road:true, block:1, refund:true, aoe:false, color:'#ffb74d', desc:'售卖能返还全部费用，用于骗伤害，只能阻挡一个单位，也可以用来空降单切。' },
-                { id:'tank', name:'重盾', icon:'🏰', cost:120, hp:876, dmg:17, range:1.6, atkSpeed:1.2, road:true, block:3, aoe:false, color:'#ff9800', desc:'标准的防御单位，性价比高。' },
-                { id:'spike', name:'尖刺', icon:'⚔️', cost:100, hp:639, dmg:40, range:1.6, atkSpeed:0.6, road:true, block:0, aoe:false, color:'#f44336', desc:'伤害高但无法阻挡单位，可以配合重盾打输出。' },
-                { id:'aoe_block', name:'旋风', icon:'🌪️', cost:160, hp:639, dmg:34, range:2.0, atkSpeed:1.0, road:true, block:2, aoe:true, maxTargets:3, color:'#ba68c8', desc:'高输出的范围伤害，能阻挡两个单位，可以减轻阻挡负担。' }
+                { id:'block1', name:'近卫', icon:'🛡️', cost:75, hp:930, dmg:32, range:1.6, atkSpeed:0.7, road:true, block:1, refund:true, aoe:false, color:'#ffb74d', desc:'售卖能返还全部费用，用于骗伤害，只能阻挡一个单位，也可以用来空降单切。' },
+                { id:'tank', name:'重盾', icon:'🏰', cost:120, hp:1276, dmg:17, range:1.6, atkSpeed:1.2, road:true, block:3, aoe:false, color:'#ff9800', desc:'标准的防御单位，性价比高。' },
+                { id:'spike', name:'尖刺', icon:'⚔️', cost:100, hp:1039, dmg:40, range:1.6, atkSpeed:0.6, road:true, block:0, aoe:false, color:'#f44336', desc:'伤害高但无法阻挡单位，可以配合重盾打输出。' },
+                { id:'aoe_block', name:'旋风', icon:'🌪️', cost:160, hp:1039, dmg:34, range:2.0, atkSpeed:1.0, road:true, block:2, aoe:true, maxTargets:3, color:'#ba68c8', desc:'高输出的范围伤害，能阻挡两个单位，可以减轻阻挡负担。' }
             ]
         };
 
@@ -218,11 +217,12 @@
                     if (this.atkCd<=0 && this.blocker && this.blocker.alive) {
                         this.atkCd=1.0;
                         this.blocker.takeDamage(this.dmg, game);
-                        spawnParticles(
-                            this.blocker.col*CELL_SIZE+CELL_SIZE/2,
-                            this.blocker.row*CELL_SIZE+CELL_SIZE/2,
-                            4, '#ff4444', {speed:60, lifetime:0.4, size:2}
-                        );
+                        // 敌人近战攻击连线
+                        const epos = this.getPos(game);
+                        const bx = this.blocker.col*CELL_SIZE+CELL_SIZE/2;
+                        const by = this.blocker.row*CELL_SIZE+CELL_SIZE/2;
+                        spawnAttackLine(epos.x, epos.y, bx, by, '#ff4444', 0.3);
+                        spawnParticles(bx, by, 5, '#ff4444', {speed:60, lifetime:0.4, size:2});
                     }
                     if (!this.blocker || !this.blocker.alive) { this.blocked=false; this.blocker=null; }
                     return;
@@ -239,11 +239,15 @@
             rangedAttack(game) {
                 const path = game.paths[this.pathIdx]; if (!path) return;
                 const ip = Math.floor(this.pathPos);
+                const epos = this.getPos(game);
                 for (let i=ip+1; i<=Math.min(ip+this.rrange, path.length-2); i++) {
                     const ru = game.getRoadUnit(path[i].c, path[i].r);
                     if (ru && ru.alive) {
                         ru.takeDamage(this.dmg, game);
-                        spawnParticles(ru.col*CELL_SIZE+CELL_SIZE/2, ru.row*CELL_SIZE+CELL_SIZE/2, 4, '#ff4444', {speed:60, lifetime:0.4, size:2});
+                        const bx = ru.col*CELL_SIZE+CELL_SIZE/2;
+                        const by = ru.row*CELL_SIZE+CELL_SIZE/2;
+                        spawnAttackLine(epos.x, epos.y, bx, by, '#9c27b0', 0.35);
+                        spawnParticles(bx, by, 5, '#9c27b0', {speed:60, lifetime:0.4, size:2});
                         break;
                     }
                 }
@@ -313,7 +317,16 @@
                 const maxTargets = this.def.maxTargets || (this.def.aoe ? 5 : 1);
                 return candidates.slice(0, maxTargets);
             }
-            takeDamage(dmg, game) { this.hp-=dmg; this.lastDmgTime=game.gameTime; if(this.hp<=0) { this.hp=0; this.alive=false; this.onDeath(game); } }
+            takeDamage(dmg, game) {
+                this.hp-=dmg; this.lastDmgTime=game.gameTime;
+                // 道路单位受伤特效
+                if (this.def.road) {
+                    const cx=this.col*CELL_SIZE+CELL_SIZE/2;
+                    const cy=this.row*CELL_SIZE+CELL_SIZE/2;
+                    spawnParticles(cx, cy, 5, '#ff6666', {speed:70, lifetime:0.4, size:3});
+                }
+                if(this.hp<=0) { this.hp=0; this.alive=false; this.onDeath(game); }
+            }
             onDeath(game) {
                 spawnParticles(this.col*CELL_SIZE+CELL_SIZE/2, this.row*CELL_SIZE+CELL_SIZE/2, 14, '#ff6600', {speed:110, lifetime:0.7, size:6});
                 while(this.blocked.length) { const en=this.blocked.pop(); en.blocked=false; en.blocker=null; }
@@ -371,13 +384,13 @@
                 return;
             }
 
-            // 随机Boss：10波后，每波只掷一次，概率可重置
+            // 随机Boss：10波后，概率重置
             if (wave > 10 && !game.bossRolledThisWave && !game.bossSpawnedThisWave) {
                 game.bossRolledThisWave = true;
                 const prob = Math.min(1.0, game.bossCurrentProb);
                 if (Math.random() < prob) {
                     game.bossSpawnedThisWave = true;
-                    game.bossCurrentProb = 0.3; // 重置概率
+                    game.bossCurrentProb = 0.3; // 重置
                     const sp = game.spawns[Math.floor(Math.random()*game.spawns.length)];
                     const enemy = new Enemy(bossDef, game.spawns.indexOf(sp), wave, game.difficultyMul);
                     game.enemies.push(enemy);
@@ -396,7 +409,7 @@
             for (const t of types) if ((roll-=t.w)<=0) { chosen=t; break; }
             const sp = game.spawns[Math.floor(Math.random()*game.spawns.length)];
             const enemy = new Enemy(chosen, game.spawns.indexOf(sp), wave, game.difficultyMul);
-            // 精英怪：第3波开始，初始5%，每波+2%，上限60%
+            // 精英怪
             if (wave >= 3) {
                 const eliteProb = Math.min(0.6, 0.05 + (wave - 3) * 0.02);
                 if (Math.random() < eliteProb) {
