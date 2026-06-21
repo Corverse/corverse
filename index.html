@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-    <title>塔防无尽模式</title>
+    <title>塔防无尽模式V3</title>
     <style>
         :root {
             --bg: #1a1a2e;
@@ -11,44 +11,38 @@
             --gold: #f0c040;
             --text: #e0e0e0;
             --btn-bg: #2a2a4a;
-            --danger: #e05555;
         }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; touch-action:manipulation; }
-        html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:'PingFang SC','Microsoft YaHei',sans-serif; display:flex; justify-content:center; align-items:center; }
-        #app { display:flex; flex-direction:column; width:100%; height:100%; max-width:500px; background:var(--bg); position:relative; }
-        #map-area { flex:0 0 auto; display:flex; align-items:center; justify-content:center; background:#0d0d1a; padding:4px; min-height:0; }
-        canvas { display:block; border-radius:6px; cursor:pointer; max-width:100%; height:auto; border:1px solid #2a2a4a; }
-        #ui-panel { flex:1; background:var(--panel-bg); padding:6px 8px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; min-height:0; border-top:2px solid #2a2a4a; }
-        #info-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; font-size:11px; }
-        .info-cell { background:rgba(255,255,255,0.05); border-radius:8px; padding:5px 6px; text-align:center; color:#ccc; font-weight:bold; white-space:nowrap; }
-        .info-cell .val { font-size:15px; display:block; margin-top:1px; }
-        .info-cell.gold .val { color:#f0c040; } .info-cell.wave .val { color:#ff9800; } .info-cell.kills .val { color:#f44336; } .info-cell.diff .val { color:#e91e63; }
-        #unit-desc { font-size:12px; color:#ddd; background:rgba(255,255,255,0.06); border-radius:8px; padding:5px 10px; text-align:center; min-height:22px; line-height:1.4; font-weight:500; }
-        #unit-buttons { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; padding:2px 0; flex-shrink:0; }
-        .unit-btn { width:68px; height:72px; border-radius:10px; border:2px solid #3a3a5a; background:var(--btn-bg); color:#ccc; font-size:10px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; transition:0.15s; position:relative; text-align:center; }
-        .unit-btn.selected { border-color:#ffcc00; box-shadow:0 0 14px rgba(255,200,0,0.55); background:#3a3a20; color:#fff; transform:scale(1.04); }
-        .unit-btn.on-cooldown { opacity:0.35; pointer-events:none; border-color:#444; }
-        .unit-btn .icon { font-size:24px; line-height:1; }
-        .unit-btn .cost { font-size:9px; color:var(--gold); font-weight:bold; }
-        .unit-btn .cd-overlay { position:absolute; bottom:3px; font-size:9px; color:#ff6666; font-weight:bold; display:none; }
-        .unit-btn.on-cooldown .cd-overlay { display:block; }
-        .unit-btn.road-unit { border-left:4px solid #ff9800; } .unit-btn.ranged-unit { border-left:4px solid #4fc3f7; }
-        #action-row { display:flex; gap:5px; flex-wrap:wrap; }
-        .action-btn { flex:1; min-width:55px; padding:8px 6px; border-radius:12px; border:none; font-size:11px; font-weight:bold; cursor:pointer; white-space:nowrap; text-align:center; transition:0.15s; }
-        .action-btn:active { transform:scale(0.94); }
-        .btn-delete-mode { background:#5c3a3a; color:#ffaaaa; border:1px solid #884444; }
-        .btn-delete-mode.active { background:#d44; color:#fff; box-shadow:0 0 12px rgba(255,60,60,0.6); }
-        .btn-settle { background:#5c4a3a; color:#ffcc88; border:1px solid #887744; }
-        .btn-pause { background:#3a4a5c; color:#88ccff; border:1px solid #447788; }
-        .btn-cancel { background:#3a3a3a; color:#ccc; border:1px solid #555; }
-        #game-over-overlay, #start-overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:100; transition:opacity 0.4s; pointer-events:auto; }
-        #game-over-overlay.hidden, #start-overlay.hidden { opacity:0; pointer-events:none; }
-        .dialog { background:#1e1e3a; border-radius:16px; padding:24px 20px; text-align:center; border:2px solid #555; max-width:340px; width:85%; color:#ccc; }
-        .dialog h2 { font-size:22px; margin-bottom:6px; } .dialog h3 { font-size:16px; color:#ffcc00; margin-bottom:12px; } .dialog p { font-size:13px; margin:3px 0; color:#bbb; }
-        .dialog .score { font-size:28px; color:#ffcc00; font-weight:bold; margin:8px 0; }
-        .dialog button { margin-top:14px; padding:10px 30px; border-radius:20px; background:#e05555; color:#fff; border:none; font-size:15px; font-weight:bold; cursor:pointer; letter-spacing:1px; }
-        .dialog button:active { background:#c04040; } .dialog .btn-start { background:#4caf50; font-size:18px; padding:12px 40px; } .dialog .btn-start:active { background:#3d8b40; }
-        .dialog .rules { text-align:left; font-size:11px; color:#aaa; margin:8px 0; line-height:1.5; }
+        html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'PingFang SC','Microsoft YaHei',sans-serif;display:flex;justify-content:center;align-items:center;}
+        #app{display:flex;flex-direction:column;width:100%;height:100%;max-width:500px;background:var(--bg);position:relative;}
+        #map-area{flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:#0d0d1a;padding:4px;min-height:0;}
+        canvas{display:block;border-radius:6px;cursor:pointer;max-width:100%;height:auto;border:1px solid #2a2a4a;}
+        #ui-panel{flex:1;background:var(--panel-bg);padding:6px 8px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;min-height:0;border-top:2px solid #2a2a4a;}
+        #info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:11px;}
+        .info-cell{background:rgba(255,255,255,0.05);border-radius:8px;padding:5px 6px;text-align:center;color:#ccc;font-weight:bold;white-space:nowrap;}
+        .info-cell .val{font-size:15px;display:block;margin-top:1px;}
+        .info-cell.gold .val{color:#f0c040;}.info-cell.wave .val{color:#ff9800;}.info-cell.kills .val{color:#f44336;}.info-cell.diff .val{color:#e91e63;}
+        #unit-desc{font-size:12px;color:#ddd;background:rgba(255,255,255,0.06);border-radius:8px;padding:5px 10px;text-align:center;min-height:22px;line-height:1.4;font-weight:500;}
+        #unit-buttons{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;padding:2px 0;flex-shrink:0;}
+        .unit-btn{width:68px;height:72px;border-radius:10px;border:2px solid #3a3a5a;background:var(--btn-bg);color:#ccc;font-size:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:0.15s;position:relative;text-align:center;}
+        .unit-btn.selected{border-color:#ffcc00;box-shadow:0 0 14px rgba(255,200,0,0.55);background:#3a3a20;color:#fff;transform:scale(1.04);}
+        .unit-btn.on-cooldown{opacity:0.35;pointer-events:none;border-color:#444;}
+        .unit-btn .icon{font-size:24px;line-height:1;}.unit-btn .cost{font-size:9px;color:var(--gold);font-weight:bold;}
+        .unit-btn .cd-overlay{position:absolute;bottom:3px;font-size:9px;color:#ff6666;font-weight:bold;display:none;}.unit-btn.on-cooldown .cd-overlay{display:block;}
+        .unit-btn.road-unit{border-left:4px solid #ff9800;}.unit-btn.ranged-unit{border-left:4px solid #4fc3f7;}
+        #action-row{display:flex;gap:5px;flex-wrap:wrap;}
+        .action-btn{flex:1;min-width:55px;padding:8px 6px;border-radius:12px;border:none;font-size:11px;font-weight:bold;cursor:pointer;white-space:nowrap;text-align:center;transition:0.15s;}
+        .action-btn:active{transform:scale(0.94);}
+        .btn-delete-mode{background:#5c3a3a;color:#ffaaaa;border:1px solid #884444;}.btn-delete-mode.active{background:#d44;color:#fff;box-shadow:0 0 12px rgba(255,60,60,0.6);}
+        .btn-settle{background:#5c4a3a;color:#ffcc88;border:1px solid #887744;}.btn-pause{background:#3a4a5c;color:#88ccff;border:1px solid #447788;}.btn-cancel{background:#3a3a3a;color:#ccc;border:1px solid #555;}
+        #game-over-overlay,#start-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:100;transition:opacity 0.4s;pointer-events:auto;}
+        #game-over-overlay.hidden,#start-overlay.hidden{opacity:0;pointer-events:none;}
+        .dialog{background:#1e1e3a;border-radius:16px;padding:24px 20px;text-align:center;border:2px solid #555;max-width:340px;width:85%;color:#ccc;}
+        .dialog h2{font-size:22px;margin-bottom:6px;}.dialog h3{font-size:16px;color:#ffcc00;margin-bottom:12px;}.dialog p{font-size:13px;margin:3px 0;color:#bbb;}
+        .dialog .score{font-size:28px;color:#ffcc00;font-weight:bold;margin:8px 0;}
+        .dialog button{margin-top:14px;padding:10px 30px;border-radius:20px;background:#e05555;color:#fff;border:none;font-size:15px;font-weight:bold;cursor:pointer;letter-spacing:1px;}
+        .dialog button:active{background:#c04040;}.dialog .btn-start{background:#4caf50;font-size:18px;padding:12px 40px;}.dialog .btn-start:active{background:#3d8b40;}
+        .dialog .rules{text-align:left;font-size:11px;color:#aaa;margin:8px 0;line-height:1.5;}
     </style>
 </head>
 <body>
@@ -73,476 +67,578 @@
         </div>
     </div>
     <div id="start-overlay">
-        <div class="dialog">
-            <h2>🏰 保卫基地</h2><h3>无尽塔防模式V2 友方全面增强</h3>
-            <div class="rules">🎯 <b>目标：</b>阻止敌人抵达基地<br>🛣️ <b>道路单位</b>（橙边）放在路上阻挡<br>🏹 <b>远程单位</b>（蓝边）放在草地输出<br>💰 金币自动增长，击杀敌人获得更多<br>⚠ 敌人会越来越强，难度随时间递增<br>🔧 出售模式可移除单位返还一半费用</div>
-            <button class="btn-start" id="btn-start-game">⚔️ 开始游戏</button>
-        </div>
+        <div class="dialog"><h2>🏰 保卫基地</h2><h3>无尽塔防模式V3 出现精英怪</h3><div class="rules">🎯 <b>目标：</b>阻止敌人抵达基地<br>🛣️ <b>道路单位</b>（橙边）放在路上阻挡<br>🏹 <b>远程单位</b>（蓝边）放在草地输出<br>💰 金币自动增长，击杀敌人获得更多<br>⚠ 敌人会越来越强，难度随时间递增<br>🔧 出售模式可移除单位返还一半费用</div><button class="btn-start" id="btn-start-game">⚔️ 开始游戏</button></div>
     </div>
     <div id="game-over-overlay" class="hidden">
-        <div class="dialog">
-            <h2 id="go-title">💔 基地被摧毁</h2>
-            <p>坚持波次: <strong id="go-wave">1</strong></p>
-            <p>击杀敌人: <strong id="go-kills">0</strong></p>
-            <p>难度倍率: <strong id="go-diff">0.50</strong>x</p>
-            <div class="score" id="go-score">0</div><p style="font-size:11px;color:#888;">总得分</p>
-            <button id="btn-replay">🔄 再来一局</button>
-        </div>
+        <div class="dialog"><h2 id="go-title">💔 基地被摧毁</h2><p>坚持波次: <strong id="go-wave">1</strong></p><p>击杀敌人: <strong id="go-kills">0</strong></p><p>难度倍率: <strong id="go-diff">0.50</strong>x</p><div class="score" id="go-score">0</div><p style="font-size:11px;color:#888;">总得分</p><button id="btn-replay">🔄 再来一局</button></div>
     </div>
 </div>
 <script>
-(function() {
-    const COLS = 16, ROWS = 8, CELL_SIZE = 52;
-    const CANVAS_W = COLS * CELL_SIZE, CANVAS_H = ROWS * CELL_SIZE;
-    const TILE_ROAD = 0, TILE_BUILDABLE = 1, TILE_BLOCKED = 2, TILE_SPAWN = 3, TILE_BASE = 4;
-    const INITIAL_GOLD = 200, MAX_GOLD = 999, GOLD_PER_SECOND = 6;
-    const COOLDOWN_DURATION = 8;
-    const HEAL_DELAY = 2.0, HEAL_RATE = 0.05;
-    const DIFFICULTY_START = 0.5;
-    const DIFFICULTY_RATE = 0.01;
+    (function() {
+        const COLS = 16, ROWS = 8, CELL_SIZE = 52;
+        const CANVAS_W = COLS * CELL_SIZE, CANVAS_H = ROWS * CELL_SIZE;
+        const TILE_ROAD = 0, TILE_BUILDABLE = 1, TILE_BLOCKED = 2, TILE_SPAWN = 3, TILE_BASE = 4;
+        const INITIAL_GOLD = 200, MAX_GOLD = 999, GOLD_PER_SECOND = 9;
+        const COOLDOWN_DURATION = 8;
+        const HEAL_DELAY = 2.0, HEAL_RATE = 0.05;
+        const DIFFICULTY_START = 0.5;
+        const DIFFICULTY_RATE = 0.01;
 
-    const MAP_PRESETS = [
-        { spawns: [{ col: 0, row: 2 }], base: { col: 15, row: 3 }, paths: [[{ c:0,r:2 },{ c:1,r:2 },{ c:2,r:2 },{ c:3,r:2 },{ c:4,r:2 },{ c:4,r:3 },{ c:4,r:4 },{ c:4,r:5 },{ c:5,r:5 },{ c:6,r:5 },{ c:7,r:5 },{ c:8,r:5 },{ c:9,r:5 },{ c:10,r:5 },{ c:11,r:5 },{ c:11,r:4 },{ c:11,r:3 },{ c:11,r:2 },{ c:11,r:1 },{ c:12,r:1 },{ c:13,r:1 },{ c:14,r:1 },{ c:15,r:1 },{ c:15,r:2 },{ c:15,r:3 }]] },
-        { spawns: [{ col: 15, row: 5 }], base: { col: 0, row: 3 }, paths: [[{ c:15,r:5 },{ c:14,r:5 },{ c:13,r:5 },{ c:12,r:5 },{ c:11,r:5 },{ c:10,r:5 },{ c:9,r:5 },{ c:8,r:5 },{ c:8,r:4 },{ c:8,r:3 },{ c:8,r:2 },{ c:8,r:1 },{ c:7,r:1 },{ c:6,r:1 },{ c:5,r:1 },{ c:4,r:1 },{ c:3,r:1 },{ c:3,r:2 },{ c:3,r:3 },{ c:3,r:4 },{ c:3,r:5 },{ c:3,r:6 },{ c:2,r:6 },{ c:1,r:6 },{ c:0,r:6 },{ c:0,r:5 },{ c:0,r:4 },{ c:0,r:3 }]] },
-        { spawns: [{ col: 0, row: 1 }, { col: 0, row: 6 }], base: { col: 15, row: 3 }, paths: [[{ c:0,r:1 },{ c:1,r:1 },{ c:2,r:1 },{ c:3,r:1 },{ c:4,r:1 },{ c:5,r:1 },{ c:5,r:2 },{ c:5,r:3 },{ c:6,r:3 },{ c:7,r:3 },{ c:8,r:3 },{ c:9,r:3 },{ c:10,r:3 },{ c:11,r:3 },{ c:12,r:3 },{ c:13,r:3 },{ c:14,r:3 },{ c:15,r:3 }],[{ c:0,r:6 },{ c:1,r:6 },{ c:2,r:6 },{ c:3,r:6 },{ c:4,r:6 },{ c:5,r:6 },{ c:5,r:5 },{ c:5,r:4 },{ c:5,r:3 },{ c:6,r:3 },{ c:7,r:3 },{ c:8,r:3 },{ c:9,r:3 },{ c:10,r:3 },{ c:11,r:3 },{ c:12,r:3 },{ c:13,r:3 },{ c:14,r:3 },{ c:15,r:3 }]] }
-    ];
+        const MAP_PRESETS = [
+            { spawns: [{ col: 0, row: 2 }], base: { col: 15, row: 3 }, paths: [[{ c:0,r:2 },{ c:1,r:2 },{ c:2,r:2 },{ c:3,r:2 },{ c:4,r:2 },{ c:4,r:3 },{ c:4,r:4 },{ c:4,r:5 },{ c:5,r:5 },{ c:6,r:5 },{ c:7,r:5 },{ c:8,r:5 },{ c:9,r:5 },{ c:10,r:5 },{ c:11,r:5 },{ c:11,r:4 },{ c:11,r:3 },{ c:11,r:2 },{ c:11,r:1 },{ c:12,r:1 },{ c:13,r:1 },{ c:14,r:1 },{ c:15,r:1 },{ c:15,r:2 },{ c:15,r:3 }]] },
+            { spawns: [{ col: 15, row: 5 }], base: { col: 0, row: 3 }, paths: [[{ c:15,r:5 },{ c:14,r:5 },{ c:13,r:5 },{ c:12,r:5 },{ c:11,r:5 },{ c:10,r:5 },{ c:9,r:5 },{ c:8,r:5 },{ c:8,r:4 },{ c:8,r:3 },{ c:8,r:2 },{ c:8,r:1 },{ c:7,r:1 },{ c:6,r:1 },{ c:5,r:1 },{ c:4,r:1 },{ c:3,r:1 },{ c:3,r:2 },{ c:3,r:3 },{ c:3,r:4 },{ c:3,r:5 },{ c:3,r:6 },{ c:2,r:6 },{ c:1,r:6 },{ c:0,r:6 },{ c:0,r:5 },{ c:0,r:4 },{ c:0,r:3 }]] },
+            { spawns: [{ col: 0, row: 1 }, { col: 0, row: 6 }], base: { col: 15, row: 3 }, paths: [[{ c:0,r:1 },{ c:1,r:1 },{ c:2,r:1 },{ c:3,r:1 },{ c:4,r:1 },{ c:5,r:1 },{ c:5,r:2 },{ c:5,r:3 },{ c:6,r:3 },{ c:7,r:3 },{ c:8,r:3 },{ c:9,r:3 },{ c:10,r:3 },{ c:11,r:3 },{ c:12,r:3 },{ c:13,r:3 },{ c:14,r:3 },{ c:15,r:3 }],[{ c:0,r:6 },{ c:1,r:6 },{ c:2,r:6 },{ c:3,r:6 },{ c:4,r:6 },{ c:5,r:6 },{ c:5,r:5 },{ c:5,r:4 },{ c:5,r:3 },{ c:6,r:3 },{ c:7,r:3 },{ c:8,r:3 },{ c:9,r:3 },{ c:10,r:3 },{ c:11,r:3 },{ c:12,r:3 },{ c:13,r:3 },{ c:14,r:3 },{ c:15,r:3 }]] }
+        ];
 
-    // 远程单位：血量统一91，伤害再降10%，射手价格100
-    const UNIT_DEFS = {
-        ranged: [
-            { id:'ranger', name:'射手', icon:'🏹', cost:100, hp:91, dmg:16, range:3.0, atkSpeed:0.7, road:false, aoe:false, color:'#4fc3f7',
-              desc:'标准的输出，性价比高，偏前期使用。' },
-            { id:'wide', name:'广域', icon:'🎯', cost:120, hp:91, dmg:11, range:5.0, atkSpeed:0.84, road:false, aoe:false, color:'#81d4fa',
-              desc:'拥有大范围的射程，建议到后期铺满角落。' },
-            { id:'bomber', name:'炮手', icon:'💣', cost:150, hp:91, dmg:22, range:2.0, atkSpeed:1.5, road:false, aoe:true, maxTargets:3, color:'#ff8a65',
-              desc:'能同时攻击三个目标，清杂利器。' },
-            { id:'quick', name:'速射', icon:'🔫', cost:120, hp:91, dmg:8, range:3.5, atkSpeed:0.35, road:false, aoe:false, color:'#a5d6a7',
-              desc:'高攻速低伤害，输出流稳定，可用于补伤害。' },
-            { id:'heavy', name:'重炮', icon:'💥', cost:200, hp:91, dmg:31, range:3.0, atkSpeed:2.0, road:false, aoe:false, color:'#ef5350',
-              desc:'高伤害低射速，多用于打BOSS。' }
-        ],
-        road: [
-            { id:'block1', name:'近卫', icon:'🛡️', cost:75, hp:330, dmg:17, range:1.6, atkSpeed:0.7, road:true, block:1, refund:true, aoe:false, color:'#ffb74d',
-              desc:'售卖能返还全部费用，用于骗伤害，只能阻挡一个单位，也可以用来空降单切。' },
-            { id:'tank', name:'重盾', icon:'🏰', cost:120, hp:676, dmg:7, range:1.6, atkSpeed:1.2, road:true, block:3, aoe:false, color:'#ff9800',
-              desc:'标准的防御单位，性价比高。' },
-            { id:'spike', name:'尖刺', icon:'⚔️', cost:100, hp:439, dmg:33, range:1.6, atkSpeed:0.6, road:true, block:0, aoe:false, color:'#f44336',
-              desc:'伤害高但无法阻挡单位，可以配合重盾打输出。' },
-            { id:'aoe_block', name:'旋风', icon:'🌪️', cost:160, hp:439, dmg:20, range:2.0, atkSpeed:1.0, road:true, block:2, aoe:true, maxTargets:3, color:'#ba68c8',
-              desc:'高输出的范围伤害，能阻挡两个单位，可以减轻阻挡负担。' }
-        ]
-    };
+        // 最终数值调整
+        const UNIT_DEFS = {
+            ranged: [
+                { id:'ranger', name:'射手', icon:'🏹', cost:100, hp:91, dmg:26, range:3.0, atkSpeed:0.7, road:false, aoe:false, color:'#4fc3f7', desc:'标准的输出，性价比高，偏前期使用。' },
+                { id:'wide', name:'广域', icon:'🎯', cost:120, hp:91, dmg:21, range:5.0, atkSpeed:0.84, road:false, aoe:false, color:'#81d4fa', desc:'拥有大范围的射程，建议到后期铺满角落。' },
+                { id:'bomber', name:'炮手', icon:'💣', cost:150, hp:91, dmg:42, range:2.0, atkSpeed:1.5, road:false, aoe:true, maxTargets:3, color:'#ff8a65', desc:'能同时攻击三个目标，清杂利器。' },
+                { id:'quick', name:'速射', icon:'🔫', cost:120, hp:91, dmg:13, range:3.5, atkSpeed:0.35, road:false, aoe:false, color:'#a5d6a7', desc:'高攻速低伤害，输出流稳定，可用于补伤害。' },
+                { id:'heavy', name:'重炮', icon:'💥', cost:200, hp:91, dmg:80, range:3.5, atkSpeed:2.0, road:false, aoe:false, color:'#ef5350', desc:'高伤害低射速，多用于打BOSS。' }
+            ],
+            road: [
+                { id:'block1', name:'近卫', icon:'🛡️', cost:75, hp:530, dmg:32, range:1.6, atkSpeed:0.7, road:true, block:1, refund:true, aoe:false, color:'#ffb74d', desc:'售卖能返还全部费用，用于骗伤害，只能阻挡一个单位，也可以用来空降单切。' },
+                { id:'tank', name:'重盾', icon:'🏰', cost:120, hp:876, dmg:17, range:1.6, atkSpeed:1.2, road:true, block:3, aoe:false, color:'#ff9800', desc:'标准的防御单位，性价比高。' },
+                { id:'spike', name:'尖刺', icon:'⚔️', cost:100, hp:639, dmg:40, range:1.6, atkSpeed:0.6, road:true, block:0, aoe:false, color:'#f44336', desc:'伤害高但无法阻挡单位，可以配合重盾打输出。' },
+                { id:'aoe_block', name:'旋风', icon:'🌪️', cost:160, hp:639, dmg:34, range:2.0, atkSpeed:1.0, road:true, block:2, aoe:true, maxTargets:3, color:'#ba68c8', desc:'高输出的范围伤害，能阻挡两个单位，可以减轻阻挡负担。' }
+            ]
+        };
 
-    const ENEMY_TYPES = [
-        { id:'normal', name:'普通', color:'#f44336', hp:70, dmg:7, spd:1.0, ranged:false, rrange:0, w:40 },
-        { id:'fast', name:'快速', color:'#ff9800', hp:35, dmg:4, spd:2.5, ranged:false, rrange:0, w:25 },
-        { id:'tank', name:'坦克', color:'#795548', hp:200, dmg:10, spd:0.5, ranged:false, rrange:0, w:20 },
-        { id:'glass', name:'高伤', color:'#e91e63', hp:45, dmg:20, spd:1.2, ranged:false, rrange:0, w:15 },
-        { id:'boss', name:'BOSS', color:'#9c27b0', hp:500, dmg:35, spd:0.4, ranged:true, rrange:3, w:0 }
-    ];
+        const ENEMY_TYPES = [
+            { id:'normal', name:'普通', color:'#f44336', hp:70, dmg:7, spd:1.0, ranged:false, rrange:0, w:40 },
+            { id:'fast', name:'快速', color:'#ff9800', hp:35, dmg:4, spd:2.5, ranged:false, rrange:0, w:25 },
+            { id:'tank', name:'坦克', color:'#795548', hp:200, dmg:10, spd:0.5, ranged:false, rrange:0, w:20 },
+            { id:'glass', name:'高伤', color:'#e91e63', hp:45, dmg:20, spd:1.2, ranged:false, rrange:0, w:15 },
+            { id:'boss', name:'BOSS', color:'#9c27b0', hp:500, dmg:35, spd:0.4, ranged:true, rrange:3, w:0 }
+        ];
 
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = CANVAS_W;
-    canvas.height = CANVAS_H;
+        const ELITE_ABILITIES = [
+            { id:'magnet', name:'磁铁', color:'#ffdd44', apply(e){ e.hpMul=1.3; e.priority=2; } },
+            { id:'regen', name:'再生', color:'#44ff88', apply(e){ e.revive=true; } },
+            { id:'sharp', name:'锋利', color:'#ff8888', apply(e){ e.dmgMul=1.3; e.spdMul=1.3; e.priority=-1; } },
+            { id:'shooter', name:'射手', color:'#88ccff', apply(e){ e.ranged=true; e.rrange=3; e.hpMul=0.7; } },
+            { id:'fury', name:'狂暴', color:'#ff4444', apply(e){ e.dmgMul=1.3; e.hpMul=1.3; } },
+            { id:'death', name:'亡语', color:'#cc88ff', apply(e){ e.deathAoe=true; } },
+            { id:'speedy', name:'速度', color:'#ffff88', apply(e){ e.spdMul=1.3; e.hpMul=1.3; } },
+            { id:'allround', name:'全能', color:'#ff88ff', apply(e){ e.hpMul=1.3; e.dmgMul=1.3; e.spdMul=1.3; } },
+            { id:'bossify', name:'boss化', color:'#aa44ff', apply(e){ e.hp=800; e.dmg=50; e.spd=0.4; e.bossified=true; } },
+            { id:'summoner', name:'召唤', color:'#88ffff', apply(e){ e.summonTimer=0; } }
+        ];
 
-    let game, selectedDef = null, deleteMode = false, paused = false;
-    let selectedPlacedUnit = null;
-    let hoverCol = null, hoverRow = null;
-    let animId, lastTime;
-    let particles = [], attackLines = [];
-    let gameStarted = false;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = CANVAS_W;
+        canvas.height = CANVAS_H;
 
-    function spawnParticles(x, y, count, color, opts = {}) {
-        const { speed = 60, lifetime = 0.6, size = 3, spread = Math.PI*2 } = opts;
-        for (let i=0; i<count; i++) {
-            const a = Math.random()*spread - spread/2;
-            particles.push({ x, y, vx: Math.cos(a)*speed*(0.5+Math.random()), vy: Math.sin(a)*speed*(0.5+Math.random()), life: lifetime*(0.5+Math.random()*0.5), maxLife: lifetime, color, size: size*(0.8+Math.random()*0.4) });
-        }
-    }
-    function spawnAttackLine(sx, sy, ex, ey, color, life=0.35) { attackLines.push({sx,sy,ex,ey,life,maxLife:life,color}); }
-    function spawnDirectedParticles(x, y, tx, ty, count, color, speed=120) {
-        const dx = tx-x, dy = ty-y, dist = Math.hypot(dx,dy)||1;
-        const vx = dx/dist*speed, vy = dy/dist*speed;
-        for (let i=0; i<count; i++) particles.push({ x, y, vx: vx+(Math.random()-0.5)*40, vy: vy+(Math.random()-0.5)*40, life:0.2+Math.random()*0.2, maxLife:0.4, color, size:2+Math.random()*2 });
-    }
-    function updateParticles(dt) {
-        for (let i=particles.length-1; i>=0; i--) { const p=particles[i]; p.x+=p.vx*dt; p.y+=p.vy*dt; p.life-=dt; if(p.life<=0) particles.splice(i,1); }
-        for (let i=attackLines.length-1; i>=0; i--) { attackLines[i].life-=dt; if(attackLines[i].life<=0) attackLines.splice(i,1); }
-    }
-    function drawParticles(ctx2) { for(const p of particles) { const a=Math.max(0,p.life/p.maxLife); ctx2.globalAlpha=a; ctx2.fillStyle=p.color; ctx2.beginPath(); ctx2.arc(p.x,p.y,p.size*a,0,Math.PI*2); ctx2.fill(); } ctx2.globalAlpha=1; }
-    function drawAttackLines(ctx2) { for(const l of attackLines) { const a=Math.max(0,l.life/l.maxLife); ctx2.strokeStyle=l.color; ctx2.globalAlpha=a; ctx2.lineWidth=2.5; ctx2.beginPath(); ctx2.moveTo(l.sx,l.sy); ctx2.lineTo(l.ex,l.ey); ctx2.stroke(); } ctx2.globalAlpha=1; }
-    function drawHealthBar(ctx2, x, y, w, h, ratio) { ctx2.fillStyle='#333'; ctx2.fillRect(x-w/2,y,w,h); ctx2.fillStyle=ratio>0.5?'#4caf50':ratio>0.25?'#ff9800':'#f44336'; ctx2.fillRect(x-w/2,y,w*Math.max(0,ratio),h); }
+        let game, selectedDef = null, deleteMode = false, paused = false;
+        let selectedPlacedUnit = null;
+        let hoverCol = null, hoverRow = null;
+        let animId, lastTime;
+        let particles = [], attackLines = [];
+        let gameStarted = false;
 
-    class Enemy {
-        constructor(def, pathIdx, wave, diffMul) {
-            this.def = def; this.pathIdx = pathIdx; this.pathPos = 0; this.alive = true;
-            this.blocked = false; this.blocker = null; this.atkCd = 0; this.rangedCd = 0;
-            const wm = wave*0.06 + diffMul;
-            this.maxHp = Math.floor(def.hp * (1+wm));
-            this.hp = this.maxHp;
-            this.dmg = Math.floor(def.dmg * (1+wm*0.7));
-            this.spd = def.spd;
-        }
-        update(dt, game) {
-            if (!this.alive) return;
-            if (this.atkCd>0) this.atkCd-=dt;
-            if (this.rangedCd>0) this.rangedCd-=dt;
-            if (this.def.ranged && this.rangedCd<=0 && !this.blocked) { this.rangedCd=1.0; this.rangedAttack(game); }
-            if (this.blocked) {
-                if (this.atkCd<=0 && this.blocker && this.blocker.alive) { this.atkCd=1.0; this.blocker.takeDamage(this.dmg, game); }
-                if (!this.blocker || !this.blocker.alive) { this.blocked=false; this.blocker=null; }
-                return;
-            }
-            const path = game.paths[this.pathIdx];
-            if (!path) return;
-            this.pathPos += this.spd * dt;
-            const ip = Math.floor(this.pathPos);
-            if (ip >= path.length-1) { this.alive=false; game.baseReached=true; return; }
-            const gp = path[ip];
-            const ru = game.getRoadUnit(gp.c, gp.r);
-            if (ru && ru.alive && ru.def.block>0 && ru.blocked.length < ru.def.block) { this.blocked=true; this.blocker=ru; ru.blocked.push(this); this.pathPos=ip; }
-        }
-        rangedAttack(game) {
-            const path = game.paths[this.pathIdx]; if (!path) return;
-            const ip = Math.floor(this.pathPos);
-            for (let i=ip+1; i<=Math.min(ip+this.def.rrange, path.length-2); i++) {
-                const ru = game.getRoadUnit(path[i].c, path[i].r);
-                if (ru && ru.alive) { ru.takeDamage(this.dmg, game); break; }
-            }
-        }
-        takeDamage(dmg, game) { this.hp-=dmg; if (this.hp<=0) { this.hp=0; this.alive=false; this.onKill(game); } }
-        onKill(game) {
-            if (this.blocker && this.blocker.alive) { const idx=this.blocker.blocked.indexOf(this); if(idx>=0) this.blocker.blocked.splice(idx,1); }
-            this.blocker=null; this.blocked=false;
-            game.gold = Math.min(MAX_GOLD, game.gold+15);
-            game.kills++;
-            const pos = this.getPos(game); spawnParticles(pos.x, pos.y, 10, this.def.color, {speed:90, lifetime:0.7, size:4});
-        }
-        getPos(game) {
-            const path = game.paths[this.pathIdx]; if (!path) return {x:0,y:0};
-            const pos = Math.max(0, Math.min(this.pathPos, path.length-1));
-            const ip = Math.floor(pos), frac = pos-ip;
-            const p0 = path[ip], p1 = path[Math.min(ip+1, path.length-1)];
-            return { x: (p0.c+(p1.c-p0.c)*frac)*CELL_SIZE+CELL_SIZE/2, y: (p0.r+(p1.r-p0.r)*frac)*CELL_SIZE+CELL_SIZE/2 };
-        }
-    }
+        const PARTICLE_SCALE = 1.8;
 
-    class Unit {
-        constructor(def, col, row) { this.def=def; this.col=col; this.row=row; this.alive=true; this.hp=def.hp; this.maxHp=def.hp; this.atkCd=0; this.blocked=[]; this.lastDmgTime=-Infinity; }
-        update(dt, game) {
-            if (!this.alive) return;
-            if (game.gameTime-this.lastDmgTime > HEAL_DELAY && this.hp<this.maxHp) {
-                this.hp = Math.min(this.maxHp, this.hp+this.maxHp*HEAL_RATE*dt);
-                if (Math.floor(game.gameTime*5)%2===0) spawnParticles(this.col*CELL_SIZE+CELL_SIZE/2, this.row*CELL_SIZE+CELL_SIZE/2-8, 1, '#00ff88', {speed:15, lifetime:0.5, size:2});
-            }
-            if (this.atkCd>0) { this.atkCd-=dt; return; }
-            const targets = this.findTargets(game);
-            if (targets.length) {
-                this.atkCd = this.def.atkSpeed;
-                targets.forEach(e => {
-                    e.takeDamage(this.def.dmg, game);
-                    const cx=this.col*CELL_SIZE+CELL_SIZE/2, cy=this.row*CELL_SIZE+CELL_SIZE/2;
-                    const tp=e.getPos(game);
-                    spawnParticles(tp.x, tp.y, 3, '#ffff00', {speed:40, lifetime:0.3, size:3});
-                    spawnDirectedParticles(cx, cy, tp.x, tp.y, 5, this.def.color, 140);
-                    spawnAttackLine(cx, cy, tp.x, tp.y, this.def.color);
+        function spawnParticles(x, y, count, color, opts = {}) {
+            const { speed = 60, lifetime = 0.6, size = 3, spread = Math.PI*2 } = opts;
+            for (let i=0; i<count; i++) {
+                const a = Math.random()*spread - spread/2;
+                particles.push({
+                    x, y,
+                    vx: Math.cos(a)*speed*(0.5+Math.random()),
+                    vy: Math.sin(a)*speed*(0.5+Math.random()),
+                    life: lifetime*(0.5+Math.random()*0.5),
+                    maxLife: lifetime,
+                    color,
+                    size: size * PARTICLE_SCALE * (0.8+Math.random()*0.4)
                 });
             }
         }
-        findTargets(game) {
-            const cx=this.col*CELL_SIZE+CELL_SIZE/2, cy=this.row*CELL_SIZE+CELL_SIZE/2;
-            const range = this.def.range * CELL_SIZE;
-            const candidates = game.enemies.filter(e=>e.alive && Math.hypot(e.getPos(game).x-cx, e.getPos(game).y-cy)<=range).sort((a,b)=>b.pathPos-a.pathPos);
-            const maxTargets = this.def.maxTargets || (this.def.aoe ? 5 : 1);
-            return candidates.slice(0, maxTargets);
+        function spawnAttackLine(sx, sy, ex, ey, color, life=0.35) { attackLines.push({sx,sy,ex,ey,life,maxLife:life,color}); }
+        function updateParticles(dt) {
+            for (let i=particles.length-1; i>=0; i--) { const p=particles[i]; p.x+=p.vx*dt; p.y+=p.vy*dt; p.life-=dt; if(p.life<=0) particles.splice(i,1); }
+            for (let i=attackLines.length-1; i>=0; i--) { attackLines[i].life-=dt; if(attackLines[i].life<=0) attackLines.splice(i,1); }
         }
-        takeDamage(dmg, game) { this.hp-=dmg; this.lastDmgTime=game.gameTime; spawnParticles(this.col*CELL_SIZE+CELL_SIZE/2, this.row*CELL_SIZE+CELL_SIZE/2, 4, '#ff6666', {speed:70, lifetime:0.35, size:3}); if(this.hp<=0) { this.hp=0; this.alive=false; this.onDeath(game); } }
-        onDeath(game) {
-            spawnParticles(this.col*CELL_SIZE+CELL_SIZE/2, this.row*CELL_SIZE+CELL_SIZE/2, 14, '#ff6600', {speed:110, lifetime:0.7, size:5});
-            while(this.blocked.length) { const en=this.blocked.pop(); en.blocked=false; en.blocker=null; }
-            if (this.def.road) { const k=`${this.col},${this.row}`; if(game.roadGrid[k]===this) delete game.roadGrid[k]; }
-            if (selectedPlacedUnit===this) selectedPlacedUnit=null;
+        function drawParticles(ctx2) { for(const p of particles){ const a=Math.max(0,p.life/p.maxLife); ctx2.globalAlpha=a; ctx2.fillStyle=p.color; ctx2.beginPath(); ctx2.arc(p.x,p.y,p.size*a,0,Math.PI*2); ctx2.fill(); } ctx2.globalAlpha=1; }
+        function drawAttackLines(ctx2) { for(const l of attackLines){ const a=Math.max(0,l.life/l.maxLife); ctx2.strokeStyle=l.color; ctx2.globalAlpha=a; ctx2.lineWidth=2.5; ctx2.beginPath(); ctx2.moveTo(l.sx,l.sy); ctx2.lineTo(l.ex,l.ey); ctx2.stroke(); } ctx2.globalAlpha=1; }
+        
+        function drawHealthBar(ctx2, x, y, w, h, ratio, isAlly = false) {
+            ctx2.fillStyle='#333';
+            ctx2.fillRect(x-w/2,y,w,h);
+            ctx2.fillStyle = isAlly ? '#4caf50' : '#f44336';
+            ctx2.fillRect(x-w/2,y,w*Math.max(0,ratio),h);
         }
-    }
 
-    function createGame(mapData) {
-        const grid = Array.from({length:ROWS}, ()=>Array(COLS).fill(TILE_BUILDABLE));
-        const roadSet = new Set();
-        mapData.paths.forEach(p=>p.forEach(pt=>roadSet.add(`${pt.c},${pt.r}`)));
-        roadSet.forEach(k=>{ const [c,r]=k.split(',').map(Number); grid[r][c]=TILE_ROAD; });
-        mapData.spawns.forEach(s=>grid[s.row][s.col]=TILE_SPAWN);
-        grid[mapData.base.row][mapData.base.col]=TILE_BASE;
-        for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
-            if (grid[r][c]===TILE_BUILDABLE && Math.random()<0.1 && !roadSet.has(`${c},${r}`)) grid[r][c]=TILE_BLOCKED;
-        }
-        return { grid, paths:mapData.paths, spawns:mapData.spawns, base:mapData.base, enemies:[], units:[], gold:INITIAL_GOLD, wave:1, kills:0, baseReached:false, gameOver:false, waveActive:false, waveDelay:8, waveTotal:0, waveSpawned:0, waveTimer:0, waveInterval:1.5, gameTime:0, goldTimer:0, cooldowns:{}, roadGrid:{}, difficultyMul:DIFFICULTY_START, getRoadUnit(c,r){ return this.roadGrid[`${c},${r}`]||null; } };
-    }
-
-    function placeUnit(game, def, col, row) {
-        if (game.gold<def.cost || (game.cooldowns[def.id]||0)>0) return false;
-        const unit = new Unit(def, col, row);
-        game.units.push({col,row,unit});
-        if (def.road) game.roadGrid[`${col},${row}`]=unit;
-        game.gold-=def.cost;
-        game.cooldowns[def.id]=COOLDOWN_DURATION;
-        spawnParticles(col*CELL_SIZE+CELL_SIZE/2, row*CELL_SIZE+CELL_SIZE/2, 10, '#00ff88', {speed:70, lifetime:0.6, size:4});
-        return true;
-    }
-    function sellUnit(game, col, row) {
-        const entry = game.units.find(u=>u.col===col&&u.row===row&&u.unit.alive);
-        if (!entry) return;
-        const unit = entry.unit;
-        const refund = unit.def.refund ? unit.def.cost : Math.floor(unit.def.cost/2);
-        game.gold = Math.min(MAX_GOLD, game.gold+refund);
-        unit.alive=false; unit.onDeath(game);
-        game.units = game.units.filter(u=>u.unit!==unit);
-    }
-    function spawnEnemy(game) {
-        if (game.waveSpawned>=game.waveTotal) return;
-        const wave = game.wave;
-        let types = ENEMY_TYPES.filter(t=>t.w>0);
-        if (wave%5===0 && game.waveSpawned===Math.floor(game.waveTotal*0.7)) types = [ENEMY_TYPES.find(t=>t.id==='boss')];
-        const totalW = types.reduce((s,t)=>s+t.w,0);
-        let roll=Math.random()*totalW, chosen=types[0];
-        for (const t of types) if ((roll-=t.w)<=0) { chosen=t; break; }
-        const sp = game.spawns[Math.floor(Math.random()*game.spawns.length)];
-        const enemy = new Enemy(chosen, game.spawns.indexOf(sp), wave, game.difficultyMul);
-        game.enemies.push(enemy);
-        game.waveSpawned++;
-        const pos = enemy.getPos(game); spawnParticles(pos.x, pos.y, 7, chosen.color, {speed:50, lifetime:0.5, size:3});
-    }
-    function startWave(game) {
-        game.wave++;
-        game.waveTotal = Math.floor(4+game.wave*1.5);
-        game.waveSpawned=0; game.waveInterval=Math.max(0.3, 2.0-game.wave*0.08);
-        game.waveActive=true; game.waveDelay=0;
-        const bx=game.base.col*CELL_SIZE+CELL_SIZE/2, by=game.base.row*CELL_SIZE+CELL_SIZE/2;
-        spawnParticles(bx, by, 16, '#ffcc00', {speed:90, lifetime:0.9, size:5});
-    }
-
-    function render() {
-        ctx.clearRect(0,0,CANVAS_W,CANVAS_H);
-        for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
-            const x=c*CELL_SIZE, y=r*CELL_SIZE;
-            ctx.fillStyle = ['#c9a87c','#5a8a4a','#4a4a4a','#b85c3a','#3a6db8'][game.grid[r][c]]||'#555';
-            ctx.fillRect(x+1,y+1,CELL_SIZE-2,CELL_SIZE-2);
-        }
-        const bx=game.base.col*CELL_SIZE+CELL_SIZE/2, by=game.base.row*CELL_SIZE+CELL_SIZE/2;
-        ctx.fillStyle='#ffdd57'; ctx.beginPath(); ctx.arc(bx,by,CELL_SIZE*0.4,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle='#fff'; ctx.font='bold 20px sans-serif'; ctx.textAlign='center'; ctx.fillText('🏠',bx,by+2);
-
-        if (selectedPlacedUnit && selectedPlacedUnit.alive) {
-            const ux=selectedPlacedUnit.col*CELL_SIZE+CELL_SIZE/2, uy=selectedPlacedUnit.row*CELL_SIZE+CELL_SIZE/2;
-            const rng = selectedPlacedUnit.def.range * CELL_SIZE;
-            ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.beginPath(); ctx.arc(ux,uy,rng,0,Math.PI*2); ctx.fill();
-            ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.lineWidth=2; ctx.setLineDash([6,4]); ctx.stroke(); ctx.setLineDash([]);
-            ctx.strokeStyle='#ffcc00'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(ux,uy,CELL_SIZE*0.4,0,Math.PI*2); ctx.stroke();
-        }
-        if (selectedDef && hoverCol!==null && hoverRow!==null && !deleteMode) {
-            const hx=hoverCol*CELL_SIZE+CELL_SIZE/2, hy=hoverRow*CELL_SIZE+CELL_SIZE/2;
-            const hasUnit = game.units.some(u=>u.col===hoverCol&&u.row===hoverRow&&u.unit.alive);
-            const tile = game.grid[hoverRow]?.[hoverCol];
-            const canPlace = !hasUnit && (selectedDef.road ? tile===TILE_ROAD : tile===TILE_BUILDABLE);
-            if (canPlace) {
-                const rng = selectedDef.range * CELL_SIZE;
-                ctx.fillStyle='rgba(100,255,150,0.18)'; ctx.beginPath(); ctx.arc(hx,hy,rng,0,Math.PI*2); ctx.fill();
-                ctx.strokeStyle='rgba(100,255,150,0.6)'; ctx.lineWidth=2; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+        class Enemy {
+            constructor(def, pathIdx, wave, diffMul) {
+                this.def = def; this.pathIdx = pathIdx; this.pathPos = 0; this.alive = true;
+                this.blocked = false; this.blocker = null; this.atkCd = 0; this.rangedCd = 0;
+                this.isElite = false; this.ability = null;
+                this.hpMul = 1.0; this.dmgMul = 1.0; this.spdMul = 1.0;
+                this.priority = 0; this.revive = false; this.ranged = def.ranged;
+                this.rrange = def.rrange; this.bossified = false;
+                this.deathAoe = false; this.summonTimer = 0;
+                const wm = wave*0.06 + diffMul;
+                this.maxHp = Math.floor(def.hp * (1+wm));
+                this.hp = this.maxHp;
+                this.dmg = Math.floor(def.dmg * (1+wm*0.7));
+                this.spd = def.spd;
             }
-        }
-
-        game.units.forEach(({unit})=>{
-            if (!unit||!unit.alive) return;
-            const cx=unit.col*CELL_SIZE+CELL_SIZE/2, cy=unit.row*CELL_SIZE+CELL_SIZE/2;
-            ctx.fillStyle=unit.def.color; ctx.beginPath(); ctx.arc(cx,cy,CELL_SIZE*0.34,0,Math.PI*2); ctx.fill();
-            ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
-            ctx.fillStyle='#fff';
-            ctx.font='bold 16px sans-serif';
-            ctx.textAlign='center';
-            ctx.textBaseline='middle';
-            ctx.fillText(unit.def.icon, cx, cy);
-            if (unit.def.road) drawHealthBar(ctx, cx, cy-CELL_SIZE*0.38-8, CELL_SIZE*0.65, 5, unit.hp/unit.maxHp);
-        });
-        game.enemies.forEach(enemy=>{
-            if (!enemy||!enemy.alive) return;
-            const {x,y} = enemy.getPos(game);
-            if (enemy.def.ranged && enemy.def.id==='boss') { ctx.strokeStyle='rgba(156,39,176,0.5)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(x,y,CELL_SIZE*0.4,0,Math.PI*2); ctx.stroke(); }
-            ctx.fillStyle=enemy.def.color; ctx.beginPath(); ctx.arc(x,y,CELL_SIZE*0.24,0,Math.PI*2); ctx.fill();
-            drawHealthBar(ctx, x, y-CELL_SIZE*0.26-7, CELL_SIZE*0.55, 4, enemy.hp/enemy.maxHp);
-        });
-        drawAttackLines(ctx); drawParticles(ctx);
-        if (paused) { ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,CANVAS_W,CANVAS_H); ctx.fillStyle='#fff'; ctx.font='bold 26px sans-serif'; ctx.textAlign='center'; ctx.fillText('⏸ 已暂停', CANVAS_W/2, CANVAS_H/2); }
-    }
-
-    function update(dt) {
-        try {
-            game.gameTime += dt;
-            game.difficultyMul = DIFFICULTY_START + game.gameTime * DIFFICULTY_RATE;
-            game.goldTimer += dt;
-            if (game.goldTimer>=1) { game.goldTimer-=1; game.gold=Math.min(MAX_GOLD, game.gold+GOLD_PER_SECOND); }
-            for (const k in game.cooldowns) game.cooldowns[k] = Math.max(0, (game.cooldowns[k]||0)-dt);
-            if (!game.waveActive) {
-                game.waveDelay -= dt;
-                if (game.waveDelay<=0) startWave(game);
-            } else {
-                if (game.waveSpawned < game.waveTotal) {
-                    game.waveTimer -= dt;
-                    if (game.waveTimer<=0) { game.waveTimer = game.waveInterval; spawnEnemy(game); }
+            applyElite(ability) {
+                this.isElite = true;
+                this.ability = ability;
+                ability.apply(this);
+                this.maxHp = Math.floor(this.maxHp * this.hpMul);
+                this.hp = this.maxHp;
+                this.dmg = Math.floor(this.dmg * this.dmgMul);
+                this.spd = this.spd * this.spdMul;
+                if (this.bossified) { this.maxHp=800; this.hp=800; this.dmg=50; this.spd=0.4; }
+            }
+            update(dt, game) {
+                if (!this.alive) return;
+                if (this.ability && this.ability.id === 'summoner') {
+                    this.summonTimer += dt;
+                    if (this.summonTimer >= 3.0) {
+                        this.summonTimer = 0;
+                        const types = ENEMY_TYPES.filter(t=>t.w>0);
+                        const type = types[Math.floor(Math.random()*types.length)];
+                        const e = new Enemy(type, this.pathIdx, game.wave, game.difficultyMul);
+                        e.pathPos = this.pathPos;
+                        game.enemies.push(e);
+                        spawnParticles(this.getPos(game).x, this.getPos(game).y, 5, '#88ffff', {speed:40, lifetime:0.4, size:3});
+                    }
                 }
-                if (game.waveSpawned>=game.waveTotal && game.enemies.every(e=>!e.alive)) { game.waveActive=false; game.waveDelay=10; }
+                if (this.atkCd>0) this.atkCd-=dt;
+                if (this.rangedCd>0) this.rangedCd-=dt;
+                if (this.ranged && this.rangedCd<=0 && !this.blocked) { this.rangedCd=1.0; this.rangedAttack(game); }
+                if (this.blocked) {
+                    if (this.atkCd<=0 && this.blocker && this.blocker.alive) {
+                        this.atkCd=1.0;
+                        this.blocker.takeDamage(this.dmg, game);
+                        spawnParticles(
+                            this.blocker.col*CELL_SIZE+CELL_SIZE/2,
+                            this.blocker.row*CELL_SIZE+CELL_SIZE/2,
+                            4, '#ff4444', {speed:60, lifetime:0.4, size:2}
+                        );
+                    }
+                    if (!this.blocker || !this.blocker.alive) { this.blocked=false; this.blocker=null; }
+                    return;
+                }
+                const path = game.paths[this.pathIdx];
+                if (!path) return;
+                this.pathPos += this.spd * dt;
+                const ip = Math.floor(this.pathPos);
+                if (ip >= path.length-1) { this.alive=false; game.baseReached=true; return; }
+                const gp = path[ip];
+                const ru = game.getRoadUnit(gp.c, gp.r);
+                if (ru && ru.alive && ru.def.block>0 && ru.blocked.length < ru.def.block) { this.blocked=true; this.blocker=ru; ru.blocked.push(this); this.pathPos=ip; }
             }
-            [...game.enemies].forEach(e=>e.alive && e.update(dt, game));
-            game.enemies = game.enemies.filter(e=>e.alive);
-            [...game.units].forEach(({unit})=>unit && unit.alive && unit.update(dt, game));
-            game.units = game.units.filter(({unit})=>unit && unit.alive);
-            updateParticles(dt);
-            if (game.baseReached) { 
-                game.gameOver = true; 
-                game.baseReached = false;
-                triggerGameOver('💔 基地被摧毁');
+            rangedAttack(game) {
+                const path = game.paths[this.pathIdx]; if (!path) return;
+                const ip = Math.floor(this.pathPos);
+                for (let i=ip+1; i<=Math.min(ip+this.rrange, path.length-2); i++) {
+                    const ru = game.getRoadUnit(path[i].c, path[i].r);
+                    if (ru && ru.alive) {
+                        ru.takeDamage(this.dmg, game);
+                        spawnParticles(ru.col*CELL_SIZE+CELL_SIZE/2, ru.row*CELL_SIZE+CELL_SIZE/2, 4, '#ff4444', {speed:60, lifetime:0.4, size:2});
+                        break;
+                    }
+                }
             }
-        } catch (e) { console.error('update error', e); }
-    }
-
-    function gameLoop(ts) {
-        if (!game) { animId=requestAnimationFrame(gameLoop); return; }
-        const dt = Math.min(0.2, (ts-lastTime)/1000 || 0.016);
-        if (!paused && !game.gameOver && gameStarted) update(dt);
-        try { render(); } catch(e) { console.error('render error', e); }
-        try { updateUI(); } catch(e) { console.error('UI error', e); }
-        lastTime = ts;
-        animId = requestAnimationFrame(gameLoop);
-    }
-
-    function updateUI() {
-        if (!game) return;
-        document.getElementById('gold-display').textContent = game.gold;
-        document.getElementById('wave-display').textContent = game.wave;
-        document.getElementById('kills-display').textContent = game.kills;
-        document.getElementById('timer-display').textContent = Math.floor(game.gameTime);
-        document.getElementById('diff-display').textContent = game.difficultyMul.toFixed(2)+'x';
-        let cdText = '-'; const cds = Object.entries(game.cooldowns).filter(([,v])=>v>0);
-        if (cds.length) cdText = cds.map(([k,v])=>`${k.slice(0,3)}:${Math.ceil(v)}s`).join(' ');
-        document.getElementById('cd-summary').textContent = cdText;
-        document.querySelectorAll('.unit-btn').forEach(btn=>{
-            const id=btn.dataset.unitId, cost=parseInt(btn.dataset.cost);
-            if ((game.cooldowns[id]||0)>0) { btn.classList.add('on-cooldown'); const cd=btn.querySelector('.cd-overlay'); if(cd) cd.textContent=Math.ceil(game.cooldowns[id])+'s'; }
-            else btn.classList.remove('on-cooldown');
-            if (!isNaN(cost)) btn.style.opacity = (game.gold<cost && !btn.classList.contains('on-cooldown')) ? '0.45' : '1';
-        });
-        const descDiv = document.getElementById('unit-desc');
-        if (selectedPlacedUnit && selectedPlacedUnit.alive) {
-            const u = selectedPlacedUnit.def;
-            descDiv.innerHTML = `<strong>🔍 ${u.icon} ${u.name}</strong> 生命:${u.hp} 伤害:${u.dmg} 范围:${u.range} 攻速:${u.atkSpeed}s` + (u.block ? ` 阻挡:${u.block}` : '') + `<br><span style="color:#aaa;font-size:11px;">${u.desc}</span>`;
-        } else if (selectedDef) {
-            const u = selectedDef;
-            descDiv.innerHTML = `<strong>📌 ${u.icon} ${u.name}</strong> 生命:${u.hp} 伤害:${u.dmg} 范围:${u.range} 攻速:${u.atkSpeed}s` + (u.block ? ` 阻挡:${u.block}` : '') + ` · 💰${u.cost}<br><span style="color:#aaa;font-size:11px;">${u.desc}</span>`;
-        } else {
-            descDiv.textContent = '👆 选择单位查看详细数据与定位';
+            takeDamage(dmg, game) { this.hp-=dmg; if (this.hp<=0) { this.hp=0; this.alive=false; this.onKill(game); } }
+            onKill(game) {
+                if (this.revive && this.hp <= 0) {
+                    this.revive = false; this.alive = true;
+                    this.hp = Math.floor(this.maxHp * 0.7);
+                    spawnParticles(this.getPos(game).x, this.getPos(game).y, 10, '#44ff88', {speed:70, lifetime:0.6, size:4});
+                    return;
+                }
+                if (this.deathAoe) {
+                    const pos = this.getPos(game);
+                    const dmg = Math.floor(this.dmg * 0.6);
+                    for (let dr=-1; dr<=1; dr++) for (let dc=-1; dc<=1; dc++) {
+                        const r = Math.round(pos.y/CELL_SIZE + dr - 0.5), c = Math.round(pos.x/CELL_SIZE + dc - 0.5);
+                        if (r>=0 && r<ROWS && c>=0 && c<COLS) {
+                            const ru = game.getRoadUnit(c, r);
+                            if (ru && ru.alive) ru.takeDamage(dmg, game);
+                        }
+                    }
+                    spawnParticles(pos.x, pos.y, 12, '#cc88ff', {speed:90, lifetime:0.8, size:5});
+                }
+                if (this.blocker && this.blocker.alive) { const idx=this.blocker.blocked.indexOf(this); if(idx>=0) this.blocker.blocked.splice(idx,1); }
+                this.blocker=null; this.blocked=false;
+                let reward = 5;
+                if (this.def.id === 'boss') reward = 10;
+                else if (this.isElite) reward = 10;
+                game.gold = Math.min(MAX_GOLD, game.gold + reward);
+                game.kills++;
+                const pos = this.getPos(game);
+                spawnParticles(pos.x, pos.y, 10, this.def.color, {speed:90, lifetime:0.7, size:4});
+                if (this.isElite) spawnParticles(pos.x, pos.y, 8, this.ability.color, {speed:90, lifetime:0.9, size:5});
+            }
+            getPos(game) {
+                const path = game.paths[this.pathIdx]; if (!path) return {x:0,y:0};
+                const pos = Math.max(0, Math.min(this.pathPos, path.length-1));
+                const ip = Math.floor(pos), frac = pos-ip;
+                const p0 = path[ip], p1 = path[Math.min(ip+1, path.length-1)];
+                return { x: (p0.c+(p1.c-p0.c)*frac)*CELL_SIZE+CELL_SIZE/2, y: (p0.r+(p1.r-p0.r)*frac)*CELL_SIZE+CELL_SIZE/2 };
+            }
         }
-        const delBtn = document.getElementById('btn-delete-mode'); delBtn.classList.toggle('active', deleteMode); delBtn.textContent = deleteMode?'🔧出售中':'🔧出售';
-        document.querySelectorAll('.unit-btn').forEach(btn=>{ btn.classList.toggle('selected', selectedDef && btn.dataset.unitId===selectedDef.id); });
-    }
 
-    function buildUnitButtons() {
-        const container = document.getElementById('unit-buttons'); container.innerHTML = '';
-        UNIT_DEFS.ranged.forEach(d=>container.appendChild(createButton(d,'ranged-unit')));
-        const sep = document.createElement('div');
-        sep.style.cssText='width:100%;height:2px;background:#2a2a4a;border-radius:1px;margin:2px 0;';
-        container.appendChild(sep);
-        UNIT_DEFS.road.forEach(d=>container.appendChild(createButton(d,'road-unit')));
-    }
-    function createButton(def, cls) {
-        const btn = document.createElement('button'); btn.className=`unit-btn ${cls}`; btn.dataset.unitId=def.id; btn.dataset.cost=def.cost;
-        btn.innerHTML = `<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">💰${def.cost}</span><span class="cd-overlay">--</span>`;
-        btn.addEventListener('click',(e)=>{ e.stopPropagation(); if(btn.classList.contains('on-cooldown')) return;
-            if (selectedDef && selectedDef.id===def.id) { selectedDef=null; deleteMode=false; }
-            else { selectedDef=def; deleteMode=false; selectedPlacedUnit=null; } updateUI(); });
-        return btn;
-    }
-
-    function getGridFromEvent(e) {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = CANVAS_W/rect.width, scaleY = CANVAS_H/rect.height;
-        let cx, cy;
-        if (e.touches) { cx=e.touches[0].clientX; cy=e.touches[0].clientY; } else { cx=e.clientX; cy=e.clientY; }
-        return { col: Math.floor((cx-rect.left)*scaleX/CELL_SIZE), row: Math.floor((cy-rect.top)*scaleY/CELL_SIZE) };
-    }
-    canvas.addEventListener('mousemove', e=>{ const {col,row}=getGridFromEvent(e); hoverCol=(col>=0&&col<COLS&&row>=0&&row<ROWS)?col:null; hoverRow=hoverCol!==null?row:null; });
-    canvas.addEventListener('touchmove', e=>{ e.preventDefault(); const {col,row}=getGridFromEvent(e); hoverCol=(col>=0&&col<COLS&&row>=0&&row<ROWS)?col:null; hoverRow=hoverCol!==null?row:null; }, {passive:false});
-    canvas.addEventListener('mouseleave', ()=>{ hoverCol=null; hoverRow=null; });
-    canvas.addEventListener('click', e=>{ const {col,row}=getGridFromEvent(e); if(col>=0&&col<COLS&&row>=0&&row<ROWS) handleClick(col,row); });
-    canvas.addEventListener('touchend', ()=>{ if(hoverCol!==null&&hoverRow!==null) handleClick(hoverCol,hoverRow); });
-
-    function handleClick(col, row) {
-        if (!game || game.gameOver || !gameStarted) return;
-        const existingUnit = game.units.find(u=>u.col===col&&u.row===row&&u.unit.alive);
-        if (deleteMode) { if (existingUnit) { sellUnit(game, col, row); selectedPlacedUnit=null; updateUI(); } return; }
-        if (existingUnit) { selectedPlacedUnit=existingUnit.unit; selectedDef=null; deleteMode=false; updateUI(); return; }
-        if (selectedDef) {
-            const tile = game.grid[row][col];
-            const canPlace = (selectedDef.road ? tile===TILE_ROAD : tile===TILE_BUILDABLE);
-            if (canPlace && game.gold>=selectedDef.cost && (game.cooldowns[selectedDef.id]||0)<=0) placeUnit(game, selectedDef, col, row);
-            updateUI(); return;
+        class Unit {
+            constructor(def, col, row) { this.def=def; this.col=col; this.row=row; this.alive=true; this.hp=def.hp; this.maxHp=def.hp; this.atkCd=0; this.blocked=[]; this.lastDmgTime=-Infinity; }
+            update(dt, game) {
+                if (!this.alive) return;
+                if (game.gameTime-this.lastDmgTime > HEAL_DELAY && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+this.maxHp*HEAL_RATE*dt);
+                if (this.atkCd>0) { this.atkCd-=dt; return; }
+                const targets = this.findTargets(game);
+                if (targets.length) {
+                    this.atkCd = this.def.atkSpeed;
+                    targets.forEach(e => {
+                        e.takeDamage(this.def.dmg, game);
+                        const cx=this.col*CELL_SIZE+CELL_SIZE/2, cy=this.row*CELL_SIZE+CELL_SIZE/2;
+                        spawnAttackLine(cx, cy, e.getPos(game).x, e.getPos(game).y, this.def.color);
+                        spawnParticles(e.getPos(game).x, e.getPos(game).y, 3, '#ffff00', {speed:50, lifetime:0.3, size:3});
+                    });
+                }
+            }
+            findTargets(game) {
+                const cx=this.col*CELL_SIZE+CELL_SIZE/2, cy=this.row*CELL_SIZE+CELL_SIZE/2;
+                const range = this.def.range * CELL_SIZE;
+                const candidates = game.enemies.filter(e=>e.alive && Math.hypot(e.getPos(game).x-cx, e.getPos(game).y-cy)<=range);
+                candidates.sort((a,b) => { if (a.priority !== b.priority) return b.priority - a.priority; return b.pathPos - a.pathPos; });
+                const maxTargets = this.def.maxTargets || (this.def.aoe ? 5 : 1);
+                return candidates.slice(0, maxTargets);
+            }
+            takeDamage(dmg, game) { this.hp-=dmg; this.lastDmgTime=game.gameTime; if(this.hp<=0) { this.hp=0; this.alive=false; this.onDeath(game); } }
+            onDeath(game) {
+                spawnParticles(this.col*CELL_SIZE+CELL_SIZE/2, this.row*CELL_SIZE+CELL_SIZE/2, 14, '#ff6600', {speed:110, lifetime:0.7, size:6});
+                while(this.blocked.length) { const en=this.blocked.pop(); en.blocked=false; en.blocker=null; }
+                if (this.def.road) { const k=`${this.col},${this.row}`; if(game.roadGrid[k]===this) delete game.roadGrid[k]; }
+                if (selectedPlacedUnit===this) selectedPlacedUnit=null;
+            }
         }
-        if (selectedPlacedUnit) { selectedPlacedUnit=null; updateUI(); }
-    }
 
-    function triggerGameOver(title) {
-        if (!game) return;
-        game.gameOver = true;
-        document.getElementById('go-title').textContent = title || '💔 基地被摧毁';
-        document.getElementById('go-wave').textContent = game.wave;
-        document.getElementById('go-kills').textContent = game.kills;
-        document.getElementById('go-diff').textContent = game.difficultyMul.toFixed(2)+'x';
-        document.getElementById('go-score').textContent = game.wave*100 + game.kills*10;
-        document.getElementById('game-over-overlay').classList.remove('hidden');
-    }
+        function createGame(mapData) {
+            const grid = Array.from({length:ROWS}, ()=>Array(COLS).fill(TILE_BUILDABLE));
+            const roadSet = new Set();
+            mapData.paths.forEach(p=>p.forEach(pt=>roadSet.add(`${pt.c},${pt.r}`)));
+            roadSet.forEach(k=>{ const [c,r]=k.split(',').map(Number); grid[r][c]=TILE_ROAD; });
+            mapData.spawns.forEach(s=>grid[s.row][s.col]=TILE_SPAWN);
+            grid[mapData.base.row][mapData.base.col]=TILE_BASE;
+            for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
+                if (grid[r][c]===TILE_BUILDABLE && Math.random()<0.1 && !roadSet.has(`${c},${r}`)) grid[r][c]=TILE_BLOCKED;
+            }
+            return { grid, paths:mapData.paths, spawns:mapData.spawns, base:mapData.base, enemies:[], units:[], gold:INITIAL_GOLD, wave:1, kills:0, baseReached:false, gameOver:false, waveActive:false, waveDelay:8, waveTotal:0, waveSpawned:0, waveTimer:0, waveInterval:1.5, gameTime:0, goldTimer:0, cooldowns:{}, roadGrid:{}, difficultyMul:DIFFICULTY_START, bossSpawnedThisWave:false, bossRolledThisWave:false, bossCurrentProb:0.3, getRoadUnit(c,r){ return this.roadGrid[`${c},${r}`]||null; } };
+        }
 
-    document.getElementById('btn-delete-mode').addEventListener('click', ()=>{ deleteMode=!deleteMode; if(deleteMode){ selectedDef=null; selectedPlacedUnit=null; } updateUI(); });
-    document.getElementById('btn-cancel-select').addEventListener('click', ()=>{ selectedDef=null; deleteMode=false; selectedPlacedUnit=null; updateUI(); });
-    document.getElementById('btn-pause').addEventListener('click', ()=>{ paused=!paused; document.getElementById('btn-pause').textContent=paused?'▶继续':'⏯暂停'; });
-    document.getElementById('btn-settle').addEventListener('click', ()=>{ if(game && !game.gameOver && gameStarted) triggerGameOver('🏁 提前结算'); });
-    document.getElementById('btn-replay').addEventListener('click', restartGame);
-    document.getElementById('btn-start-game').addEventListener('click', ()=>{ document.getElementById('start-overlay').classList.add('hidden'); gameStarted=true; if(game) lastTime=performance.now(); });
+        function placeUnit(game, def, col, row) {
+            if (game.gold<def.cost || (game.cooldowns[def.id]||0)>0) return false;
+            const unit = new Unit(def, col, row);
+            game.units.push({col,row,unit});
+            if (def.road) game.roadGrid[`${col},${row}`]=unit;
+            game.gold-=def.cost;
+            game.cooldowns[def.id]=COOLDOWN_DURATION;
+            spawnParticles(col*CELL_SIZE+CELL_SIZE/2, row*CELL_SIZE+CELL_SIZE/2, 10, '#00ff88', {speed:70, lifetime:0.6, size:4});
+            return true;
+        }
+        function sellUnit(game, col, row) {
+            const entry = game.units.find(u=>u.col===col&&u.row===row&&u.unit.alive);
+            if (!entry) return;
+            const unit = entry.unit;
+            const refund = unit.def.refund ? unit.def.cost : Math.floor(unit.def.cost/2);
+            game.gold = Math.min(MAX_GOLD, game.gold+refund);
+            unit.alive=false; unit.onDeath(game);
+            game.units = game.units.filter(u=>u.unit!==unit);
+        }
 
-    function restartGame() {
-        if (animId) cancelAnimationFrame(animId);
-        const map = MAP_PRESETS[Math.floor(Math.random()*MAP_PRESETS.length)];
-        game = createGame(map);
-        selectedDef=null; deleteMode=false; paused=false; selectedPlacedUnit=null; hoverCol=null; hoverRow=null;
-        particles=[]; attackLines=[]; gameStarted=false;
-        document.getElementById('game-over-overlay').classList.add('hidden');
-        document.getElementById('start-overlay').classList.remove('hidden');
-        document.getElementById('btn-pause').textContent='⏯暂停';
-        buildUnitButtons(); updateUI();
-        lastTime = performance.now();
-        animId = requestAnimationFrame(gameLoop);
-    }
+        function spawnEnemy(game) {
+            if (game.waveSpawned >= game.waveTotal) return;
+            const wave = game.wave;
+            const bossDef = ENEMY_TYPES.find(t=>t.id==='boss');
 
-    function init() {
-        buildUnitButtons();
-        const map = MAP_PRESETS[Math.floor(Math.random()*MAP_PRESETS.length)];
-        game = createGame(map);
-        updateUI();
-        lastTime = performance.now();
-        animId = requestAnimationFrame(gameLoop);
-    }
+            // 强制Boss波次
+            if ((wave === 5 || wave === 8 || wave === 10) && !game.bossSpawnedThisWave) {
+                game.bossSpawnedThisWave = true;
+                const sp = game.spawns[Math.floor(Math.random()*game.spawns.length)];
+                const enemy = new Enemy(bossDef, game.spawns.indexOf(sp), wave, game.difficultyMul);
+                game.enemies.push(enemy);
+                game.waveSpawned++;
+                spawnParticles(enemy.getPos(game).x, enemy.getPos(game).y, 14, '#9c27b0', {speed:90, lifetime:0.9, size:5});
+                return;
+            }
 
-    function resizeCanvas() {
-        const container = document.getElementById('map-area');
-        const cw = container.clientWidth - 8;
-        const aspect = CANVAS_W / CANVAS_H;
-        const dw = Math.min(cw, CANVAS_W);
-        const dh = dw / aspect;
-        canvas.style.width = dw+'px';
-        canvas.style.height = dh+'px';
-    }
-    window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('orientationchange', ()=>setTimeout(resizeCanvas,200));
-    setTimeout(resizeCanvas, 150);
-    init();
-})();
+            // 随机Boss：10波后，每波只掷一次，概率可重置
+            if (wave > 10 && !game.bossRolledThisWave && !game.bossSpawnedThisWave) {
+                game.bossRolledThisWave = true;
+                const prob = Math.min(1.0, game.bossCurrentProb);
+                if (Math.random() < prob) {
+                    game.bossSpawnedThisWave = true;
+                    game.bossCurrentProb = 0.3; // 重置概率
+                    const sp = game.spawns[Math.floor(Math.random()*game.spawns.length)];
+                    const enemy = new Enemy(bossDef, game.spawns.indexOf(sp), wave, game.difficultyMul);
+                    game.enemies.push(enemy);
+                    game.waveSpawned++;
+                    spawnParticles(enemy.getPos(game).x, enemy.getPos(game).y, 14, '#9c27b0', {speed:90, lifetime:0.9, size:5});
+                    return;
+                } else {
+                    game.bossCurrentProb = Math.min(1.0, game.bossCurrentProb + 0.05);
+                }
+            }
+
+            // 普通敌人
+            let types = ENEMY_TYPES.filter(t=>t.w>0);
+            const totalW = types.reduce((s,t)=>s+t.w,0);
+            let roll=Math.random()*totalW, chosen=types[0];
+            for (const t of types) if ((roll-=t.w)<=0) { chosen=t; break; }
+            const sp = game.spawns[Math.floor(Math.random()*game.spawns.length)];
+            const enemy = new Enemy(chosen, game.spawns.indexOf(sp), wave, game.difficultyMul);
+            // 精英怪：第3波开始，初始5%，每波+2%，上限60%
+            if (wave >= 3) {
+                const eliteProb = Math.min(0.6, 0.05 + (wave - 3) * 0.02);
+                if (Math.random() < eliteProb) {
+                    const ability = ELITE_ABILITIES[Math.floor(Math.random() * ELITE_ABILITIES.length)];
+                    enemy.applyElite(ability);
+                    spawnParticles(enemy.getPos(game).x, enemy.getPos(game).y, 8, ability.color, {speed:70, lifetime:0.6, size:4});
+                }
+            }
+            game.enemies.push(enemy);
+            game.waveSpawned++;
+            spawnParticles(enemy.getPos(game).x, enemy.getPos(game).y, 5, chosen.color, {speed:50, lifetime:0.5, size:4});
+        }
+
+        function startWave(game) {
+            game.wave++;
+            game.waveTotal = Math.floor(4+game.wave*1.5);
+            game.waveSpawned=0; game.waveInterval=Math.max(0.3, 2.0-game.wave*0.08);
+            game.waveActive=true; game.waveDelay=0;
+            game.bossSpawnedThisWave = false;
+            game.bossRolledThisWave = false;
+            const bx=game.base.col*CELL_SIZE+CELL_SIZE/2, by=game.base.row*CELL_SIZE+CELL_SIZE/2;
+            spawnParticles(bx, by, 16, '#ffcc00', {speed:90, lifetime:0.8, size:5});
+        }
+
+        function render() {
+            ctx.clearRect(0,0,CANVAS_W,CANVAS_H);
+            for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
+                const x=c*CELL_SIZE, y=r*CELL_SIZE;
+                ctx.fillStyle = ['#c9a87c','#5a8a4a','#4a4a4a','#b85c3a','#3a6db8'][game.grid[r][c]]||'#555';
+                ctx.fillRect(x+1,y+1,CELL_SIZE-2,CELL_SIZE-2);
+            }
+            const bx=game.base.col*CELL_SIZE+CELL_SIZE/2, by=game.base.row*CELL_SIZE+CELL_SIZE/2;
+            ctx.fillStyle='#ffdd57'; ctx.beginPath(); ctx.arc(bx,by,CELL_SIZE*0.4,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='#fff'; ctx.font='bold 20px sans-serif'; ctx.textAlign='center'; ctx.fillText('🏠',bx,by+2);
+
+            if (selectedPlacedUnit && selectedPlacedUnit.alive) {
+                const ux=selectedPlacedUnit.col*CELL_SIZE+CELL_SIZE/2, uy=selectedPlacedUnit.row*CELL_SIZE+CELL_SIZE/2;
+                const rng = selectedPlacedUnit.def.range * CELL_SIZE;
+                ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.beginPath(); ctx.arc(ux,uy,rng,0,Math.PI*2); ctx.fill();
+                ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.lineWidth=2; ctx.setLineDash([6,4]); ctx.stroke(); ctx.setLineDash([]);
+            }
+            if (selectedDef && hoverCol!==null && hoverRow!==null && !deleteMode) {
+                const hx=hoverCol*CELL_SIZE+CELL_SIZE/2, hy=hoverRow*CELL_SIZE+CELL_SIZE/2;
+                const hasUnit = game.units.some(u=>u.col===hoverCol&&u.row===hoverRow&&u.unit.alive);
+                const tile = game.grid[hoverRow]?.[hoverCol];
+                const canPlace = !hasUnit && (selectedDef.road ? tile===TILE_ROAD : tile===TILE_BUILDABLE);
+                if (canPlace) {
+                    const rng = selectedDef.range * CELL_SIZE;
+                    ctx.fillStyle='rgba(100,255,150,0.18)'; ctx.beginPath(); ctx.arc(hx,hy,rng,0,Math.PI*2); ctx.fill();
+                    ctx.strokeStyle='rgba(100,255,150,0.6)'; ctx.lineWidth=2; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+                }
+            }
+
+            game.units.forEach(({unit})=>{
+                if (!unit||!unit.alive) return;
+                const cx=unit.col*CELL_SIZE+CELL_SIZE/2, cy=unit.row*CELL_SIZE+CELL_SIZE/2;
+                ctx.fillStyle=unit.def.color; ctx.beginPath(); ctx.arc(cx,cy,CELL_SIZE*0.34,0,Math.PI*2); ctx.fill();
+                ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+                ctx.fillStyle='#fff'; ctx.font='bold 16px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                ctx.fillText(unit.def.icon, cx, cy);
+                if (unit.def.road) drawHealthBar(ctx, cx, cy-CELL_SIZE*0.38-8, CELL_SIZE*0.65, 5, unit.hp/unit.maxHp, true);
+            });
+            game.enemies.forEach(enemy=>{
+                if (!enemy||!enemy.alive) return;
+                const {x,y} = enemy.getPos(game);
+                if (enemy.isElite) {
+                    ctx.strokeStyle = enemy.ability.color;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.arc(x,y,CELL_SIZE*0.32,0,Math.PI*2); ctx.stroke();
+                    ctx.fillStyle = enemy.ability.color;
+                    ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText(enemy.ability.name[0], x, y-CELL_SIZE*0.35);
+                }
+                if (enemy.def.ranged && enemy.def.id==='boss') {
+                    ctx.strokeStyle='rgba(156,39,176,0.5)'; ctx.lineWidth=3;
+                    ctx.beginPath(); ctx.arc(x,y,CELL_SIZE*0.4,0,Math.PI*2); ctx.stroke();
+                }
+                ctx.fillStyle=enemy.def.color; ctx.beginPath(); ctx.arc(x,y,CELL_SIZE*0.24,0,Math.PI*2); ctx.fill();
+                drawHealthBar(ctx, x, y-CELL_SIZE*0.26-7, CELL_SIZE*0.55, 4, enemy.hp/enemy.maxHp, false);
+            });
+            drawAttackLines(ctx); drawParticles(ctx);
+            if (paused) { ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,CANVAS_W,CANVAS_H); }
+        }
+
+        function update(dt) {
+            try {
+                game.gameTime += dt;
+                game.difficultyMul = DIFFICULTY_START + game.gameTime * DIFFICULTY_RATE;
+                game.goldTimer += dt;
+                if (game.goldTimer>=1) { game.goldTimer-=1; game.gold=Math.min(MAX_GOLD, game.gold+GOLD_PER_SECOND); }
+                for (const k in game.cooldowns) game.cooldowns[k] = Math.max(0, (game.cooldowns[k]||0)-dt);
+                if (!game.waveActive) {
+                    game.waveDelay -= dt;
+                    if (game.waveDelay<=0) startWave(game);
+                } else {
+                    if (game.waveSpawned < game.waveTotal) {
+                        game.waveTimer -= dt;
+                        if (game.waveTimer<=0) { game.waveTimer = game.waveInterval; spawnEnemy(game); }
+                    }
+                    if (game.waveSpawned>=game.waveTotal && game.enemies.every(e=>!e.alive)) { game.waveActive=false; game.waveDelay=10; }
+                }
+                [...game.enemies].forEach(e=>e.alive && e.update(dt, game));
+                game.enemies = game.enemies.filter(e=>e.alive);
+                [...game.units].forEach(({unit})=>unit && unit.alive && unit.update(dt, game));
+                game.units = game.units.filter(({unit})=>unit && unit.alive);
+                updateParticles(dt);
+                if (game.baseReached) { game.gameOver = true; game.baseReached = false; triggerGameOver('💔 基地被摧毁'); }
+            } catch(e) { console.error(e); }
+        }
+
+        function gameLoop(ts) {
+            if (!game) { animId=requestAnimationFrame(gameLoop); return; }
+            const dt = Math.min(0.2, (ts-lastTime)/1000 || 0.016);
+            if (!paused && !game.gameOver && gameStarted) update(dt);
+            try { render(); } catch(e) {}
+            try { updateUI(); } catch(e) {}
+            lastTime = ts;
+            animId = requestAnimationFrame(gameLoop);
+        }
+
+        function updateUI() {
+            if (!game) return;
+            document.getElementById('gold-display').textContent = game.gold;
+            document.getElementById('wave-display').textContent = game.wave;
+            document.getElementById('kills-display').textContent = game.kills;
+            document.getElementById('timer-display').textContent = Math.floor(game.gameTime);
+            document.getElementById('diff-display').textContent = game.difficultyMul.toFixed(2)+'x';
+            let cdText = '-'; const cds = Object.entries(game.cooldowns).filter(([,v])=>v>0);
+            if (cds.length) cdText = cds.map(([k,v])=>`${k.slice(0,3)}:${Math.ceil(v)}s`).join(' ');
+            document.getElementById('cd-summary').textContent = cdText;
+            document.querySelectorAll('.unit-btn').forEach(btn=>{
+                const id=btn.dataset.unitId, cost=parseInt(btn.dataset.cost);
+                if ((game.cooldowns[id]||0)>0) { btn.classList.add('on-cooldown'); btn.querySelector('.cd-overlay').textContent=Math.ceil(game.cooldowns[id])+'s'; }
+                else btn.classList.remove('on-cooldown');
+                if (!isNaN(cost)) btn.style.opacity = (game.gold<cost && !btn.classList.contains('on-cooldown')) ? '0.45' : '1';
+            });
+            const descDiv = document.getElementById('unit-desc');
+            if (selectedPlacedUnit && selectedPlacedUnit.alive) {
+                const u = selectedPlacedUnit.def;
+                descDiv.innerHTML = `<strong>🔍 ${u.icon} ${u.name}</strong> 生命:${u.hp} 伤害:${u.dmg} 范围:${u.range} 攻速:${u.atkSpeed}s` + (u.block ? ` 阻挡:${u.block}` : '') + `<br><span style="color:#aaa;font-size:11px;">${u.desc}</span>`;
+            } else if (selectedDef) {
+                const u = selectedDef;
+                descDiv.innerHTML = `<strong>📌 ${u.icon} ${u.name}</strong> 生命:${u.hp} 伤害:${u.dmg} 范围:${u.range} 攻速:${u.atkSpeed}s` + (u.block ? ` 阻挡:${u.block}` : '') + ` · 💰${u.cost}<br><span style="color:#aaa;font-size:11px;">${u.desc}</span>`;
+            } else {
+                descDiv.textContent = '👆 选择单位查看详细数据与定位';
+            }
+            document.getElementById('btn-delete-mode').classList.toggle('active', deleteMode);
+            document.getElementById('btn-delete-mode').textContent = deleteMode?'🔧出售中':'🔧出售';
+            document.querySelectorAll('.unit-btn').forEach(btn=>{ btn.classList.toggle('selected', selectedDef && btn.dataset.unitId===selectedDef.id); });
+        }
+
+        function buildUnitButtons() {
+            const container = document.getElementById('unit-buttons'); container.innerHTML = '';
+            UNIT_DEFS.ranged.forEach(d=>container.appendChild(createButton(d,'ranged-unit')));
+            const sep = document.createElement('div'); sep.style.cssText='width:100%;height:2px;background:#2a2a4a;border-radius:1px;margin:2px 0;'; container.appendChild(sep);
+            UNIT_DEFS.road.forEach(d=>container.appendChild(createButton(d,'road-unit')));
+        }
+        function createButton(def, cls) {
+            const btn = document.createElement('button'); btn.className=`unit-btn ${cls}`; btn.dataset.unitId=def.id; btn.dataset.cost=def.cost;
+            btn.innerHTML = `<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">💰${def.cost}</span><span class="cd-overlay">--</span>`;
+            btn.addEventListener('click',(e)=>{ e.stopPropagation(); if(btn.classList.contains('on-cooldown')) return;
+                if (selectedDef && selectedDef.id===def.id) { selectedDef=null; deleteMode=false; } else { selectedDef=def; deleteMode=false; selectedPlacedUnit=null; } updateUI(); });
+            return btn;
+        }
+
+        function getGridFromEvent(e) {
+            const rect = canvas.getBoundingClientRect(); const scaleX = CANVAS_W/rect.width, scaleY = CANVAS_H/rect.height;
+            let cx, cy; if (e.touches) { cx=e.touches[0].clientX; cy=e.touches[0].clientY; } else { cx=e.clientX; cy=e.clientY; }
+            return { col: Math.floor((cx-rect.left)*scaleX/CELL_SIZE), row: Math.floor((cy-rect.top)*scaleY/CELL_SIZE) };
+        }
+        canvas.addEventListener('mousemove', e=>{ const {col,row}=getGridFromEvent(e); hoverCol=(col>=0&&col<COLS&&row>=0&&row<ROWS)?col:null; hoverRow=hoverCol!==null?row:null; });
+        canvas.addEventListener('touchmove', e=>{ e.preventDefault(); const {col,row}=getGridFromEvent(e); hoverCol=(col>=0&&col<COLS&&row>=0&&row<ROWS)?col:null; hoverRow=hoverCol!==null?row:null; }, {passive:false});
+        canvas.addEventListener('mouseleave', ()=>{ hoverCol=null; hoverRow=null; });
+        canvas.addEventListener('click', e=>{ const {col,row}=getGridFromEvent(e); if(col>=0&&col<COLS&&row>=0&&row<ROWS) handleClick(col,row); });
+        canvas.addEventListener('touchend', ()=>{ if(hoverCol!==null&&hoverRow!==null) handleClick(hoverCol,hoverRow); });
+
+        function handleClick(col, row) {
+            if (!game || game.gameOver || !gameStarted) return;
+            const existingUnit = game.units.find(u=>u.col===col&&u.row===row&&u.unit.alive);
+            if (deleteMode) { if (existingUnit) { sellUnit(game, col, row); selectedPlacedUnit=null; updateUI(); } return; }
+            if (existingUnit) { selectedPlacedUnit=existingUnit.unit; selectedDef=null; deleteMode=false; updateUI(); return; }
+            if (selectedDef) {
+                const tile = game.grid[row][col];
+                const canPlace = (selectedDef.road ? tile===TILE_ROAD : tile===TILE_BUILDABLE);
+                if (canPlace && game.gold>=selectedDef.cost && (game.cooldowns[selectedDef.id]||0)<=0) { placeUnit(game, selectedDef, col, row); updateUI(); }
+                return;
+            }
+            if (selectedPlacedUnit) { selectedPlacedUnit=null; updateUI(); }
+        }
+
+        function triggerGameOver(title) {
+            if (!game) return;
+            game.gameOver = true;
+            document.getElementById('go-title').textContent = title;
+            document.getElementById('go-wave').textContent = game.wave;
+            document.getElementById('go-kills').textContent = game.kills;
+            document.getElementById('go-diff').textContent = game.difficultyMul.toFixed(2)+'x';
+            document.getElementById('go-score').textContent = game.wave*100 + game.kills*10;
+            document.getElementById('game-over-overlay').classList.remove('hidden');
+        }
+
+        document.getElementById('btn-delete-mode').addEventListener('click', ()=>{ deleteMode=!deleteMode; if(deleteMode){ selectedDef=null; selectedPlacedUnit=null; } updateUI(); });
+        document.getElementById('btn-cancel-select').addEventListener('click', ()=>{ selectedDef=null; deleteMode=false; selectedPlacedUnit=null; updateUI(); });
+        document.getElementById('btn-pause').addEventListener('click', ()=>{ paused=!paused; document.getElementById('btn-pause').textContent=paused?'▶继续':'⏯暂停'; });
+        document.getElementById('btn-settle').addEventListener('click', ()=>{ if(game && !game.gameOver && gameStarted) triggerGameOver('🏁 提前结算'); });
+        document.getElementById('btn-replay').addEventListener('click', restartGame);
+        document.getElementById('btn-start-game').addEventListener('click', ()=>{ document.getElementById('start-overlay').classList.add('hidden'); gameStarted=true; if(game) lastTime=performance.now(); });
+
+        function restartGame() {
+            if (animId) cancelAnimationFrame(animId);
+            const map = MAP_PRESETS[Math.floor(Math.random()*MAP_PRESETS.length)];
+            game = createGame(map);
+            selectedDef=null; deleteMode=false; paused=false; selectedPlacedUnit=null; hoverCol=null; hoverRow=null;
+            particles=[]; attackLines=[]; gameStarted=false;
+            document.getElementById('game-over-overlay').classList.add('hidden');
+            document.getElementById('start-overlay').classList.remove('hidden');
+            document.getElementById('btn-pause').textContent='⏯暂停';
+            buildUnitButtons(); updateUI();
+            lastTime = performance.now();
+            animId = requestAnimationFrame(gameLoop);
+        }
+
+        function init() {
+            buildUnitButtons();
+            const map = MAP_PRESETS[Math.floor(Math.random()*MAP_PRESETS.length)];
+            game = createGame(map);
+            updateUI();
+            lastTime = performance.now();
+            animId = requestAnimationFrame(gameLoop);
+        }
+
+        function resizeCanvas() {
+            const container = document.getElementById('map-area');
+            const cw = container.clientWidth - 8, aspect = CANVAS_W/CANVAS_H;
+            const dw = Math.min(cw, CANVAS_W), dh = dw/aspect;
+            canvas.style.width = dw+'px'; canvas.style.height = dh+'px';
+        }
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', ()=>setTimeout(resizeCanvas,200));
+        setTimeout(resizeCanvas, 150);
+        init();
+    })();
 </script>
 </body>
 </html>
